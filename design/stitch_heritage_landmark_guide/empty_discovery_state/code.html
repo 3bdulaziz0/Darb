@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Nearby Landmarks - Empty State</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&amp;family=Space+Grotesk:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "secondary-fixed-dim": "#dec395",
+                        "on-primary-fixed": "#1b0063",
+                        "error": "#ffb4ab",
+                        "on-secondary-container": "#d0b588",
+                        "primary-container": "#6c4bf4",
+                        "tertiary-fixed": "#ffdbc8",
+                        "surface-tint": "#c9beff",
+                        "primary": "#c9beff",
+                        "surface-container": "#1f1f23",
+                        "on-tertiary-container": "#ffe9de",
+                        "surface-container-high": "#2a292e",
+                        "on-secondary-fixed-variant": "#574421",
+                        "tertiary-container": "#ad5100",
+                        "inverse-surface": "#e4e1e7",
+                        "surface-container-lowest": "#0e0e12",
+                        "on-primary-container": "#f1eaff",
+                        "surface-container-low": "#1b1b1f",
+                        "on-error-container": "#ffdad6",
+                        "on-primary": "#30009b",
+                        "tertiary-fixed-dim": "#ffb68b",
+                        "outline-variant": "#484555",
+                        "on-primary-fixed-variant": "#4612cf",
+                        "background": "#131317",
+                        "on-secondary-fixed": "#271900",
+                        "inverse-primary": "#5f3be6",
+                        "primary-fixed-dim": "#c9beff",
+                        "secondary-fixed": "#fcdfaf",
+                        "error-container": "#93000a",
+                        "on-background": "#e4e1e7",
+                        "surface": "#131317",
+                        "secondary-container": "#594623",
+                        "inverse-on-surface": "#303034",
+                        "surface-dim": "#131317",
+                        "on-surface-variant": "#c9c4d8",
+                        "on-tertiary": "#522300",
+                        "primary-fixed": "#e6deff",
+                        "on-surface": "#e4e1e7",
+                        "tertiary": "#ffb68b",
+                        "outline": "#938ea1",
+                        "surface-bright": "#39393d",
+                        "on-tertiary-fixed-variant": "#743400",
+                        "surface-variant": "#353439",
+                        "on-error": "#690005",
+                        "on-tertiary-fixed": "#321300",
+                        "secondary": "#dec395",
+                        "on-secondary": "#3e2e0c",
+                        "surface-container-highest": "#353439"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-lg": "48px",
+                        "margin-desktop": "64px",
+                        "touch-target-min": "44px",
+                        "stack-md": "24px",
+                        "gutter": "16px",
+                        "stack-sm": "8px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "display-lg-mobile": ["Manrope"],
+                        "display-lg": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "caption": ["Manrope"],
+                        "body-lg": ["Manrope"],
+                        "label-caps": ["Space Grotesk"],
+                        "headline-md": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "caption": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }]
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-background text-on-surface min-h-screen relative overflow-hidden font-body-md">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 flex justify-between items-center px-margin-mobile h-14 bg-surface/60 dark:bg-surface/60 backdrop-blur-xl border-b border-outline-variant/20">
+<button aria-label="Go back" class="w-[44px] h-[44px] flex items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-on-surface/10 transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="language" style="font-variation-settings: 'FILL' 0;">language</span>
+</button>
+<h1 class="font-label-caps text-label-caps tracking-widest text-on-surface dark:text-on-surface uppercase">District Landmark</h1>
+<button aria-label="Menu" class="w-[44px] h-[44px] flex items-center justify-center text-on-surface-variant dark:text-on-surface-variant hover:bg-on-surface/10 transition-colors rounded-full">
+<span class="material-symbols-outlined" data-icon="menu" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+</header>
+<!-- Background Map / Canvas -->
+<div class="absolute inset-0 z-0">
+<img class="w-full h-full object-cover opacity-60" data-alt="A dark mode map visualization of a historic city district, rendered in a sophisticated, minimalist architectural style. The map uses deep violet and charcoal tones with subtle glows indicating streets and topography, embodying a premium, editorial aesthetic suitable for heritage exploration. The image should be abstract enough to serve as a background." data-location="Historic District" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBRvMqbefQbsDaPc6gGYgriuypzxREQ0busB4SMytZn3nTT_qiz3Q4O90NQzBmMKO_S_ABr0GVfgZiPtNI5QywIRSFd3tjKNlx3wgpZXsuIBX_I6zlKRadjpPl8-T33e9qun5TzVaThAxKQQrzAPc8TfBWCbs4fu546BPjyPbAHEHOYhSNsv0reJkm-56jbnyeDfPbOTWoKl4pLgYs3MJQd5hJuolwsP_OiLp9Z8Dd7dE2YPSiOjXIx"/>
+<div class="absolute inset-0 bg-background/40 mix-blend-multiply"></div>
+</div>
+<!-- Main Content Area -->
+<main class="relative z-10 flex flex-col items-center justify-center min-h-screen px-margin-mobile pt-14 pb-32">
+<!-- Empty State Card -->
+<div class="w-full max-w-md bg-surface/80 backdrop-blur-xl rounded-[20px] p-stack-md flex flex-col items-center text-center border border-outline-variant/20 shadow-2xl">
+<!-- Minimalist Illustration -->
+<div class="w-24 h-24 mb-stack-md relative flex items-center justify-center">
+<div class="absolute inset-0 border-2 border-dashed border-outline-variant rounded-full animate-[spin_10s_linear_infinite]"></div>
+<span class="material-symbols-outlined text-4xl text-on-surface-variant" data-icon="location_off" style="font-variation-settings: 'FILL' 0;">location_off</span>
+</div>
+<!-- Typography -->
+<h2 class="font-headline-md text-headline-md text-on-surface mb-stack-sm">No verified landmarks within 5 km</h2>
+<p class="font-body-md text-body-md text-on-surface-variant mb-stack-lg max-w-[280px]">Our library covers 12 landmarks in the historic district.</p>
+<!-- Featured Alternative -->
+<button class="w-full bg-surface-variant/50 hover:bg-surface-variant/80 transition-colors rounded-xl p-4 flex items-center justify-between mb-stack-md border border-outline-variant/20 min-h-[64px]">
+<div class="flex flex-col items-start">
+<span class="font-body-lg text-body-lg text-on-surface">Historic District Center</span>
+<span class="font-label-caps text-label-caps text-secondary">7.2 km</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" data-icon="arrow_forward" style="font-variation-settings: 'FILL' 0;">arrow_forward</span>
+</button>
+<!-- Primary Action -->
+<button class="w-full bg-primary-container text-on-primary-container font-headline-md text-body-lg h-[56px] rounded-xl flex items-center justify-center hover:opacity-90 transition-opacity">
+                Search within 20 km
+            </button>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-margin-mobile pb-8 pt-4 bg-surface/60 dark:bg-surface/60 backdrop-blur-xl border-t border-outline-variant/20 rounded-t-xl md:hidden">
+<a aria-label="Explore" class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full w-14 h-14 transition-all scale-90" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="explore" style="font-variation-settings: 'FILL' 1;">explore</span>
+</a>
+<a aria-label="Camera" class="flex flex-col items-center justify-center text-on-surface-variant w-12 h-12 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="camera" style="font-variation-settings: 'FILL' 0;">camera</span>
+</a>
+<a aria-label="Settings" class="flex flex-col items-center justify-center text-on-surface-variant w-12 h-12 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined mb-1" data-icon="settings" style="font-variation-settings: 'FILL' 0;">settings</span>
+</a>
+</nav>
+<!-- Desktop Nav Placeholder (Hidden on Mobile) -->
+<nav class="hidden md:flex fixed top-0 left-0 h-full w-20 flex-col items-center py-stack-lg bg-surface/60 backdrop-blur-xl border-r border-outline-variant/20 z-40">
+<div class="flex-1 flex flex-col gap-stack-md mt-14">
+<a aria-label="Explore" class="flex flex-col items-center justify-center bg-primary-container text-on-primary-container rounded-full w-14 h-14 transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="explore" style="font-variation-settings: 'FILL' 1;">explore</span>
+</a>
+<a aria-label="Camera" class="flex flex-col items-center justify-center text-on-surface-variant w-12 h-12 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="camera" style="font-variation-settings: 'FILL' 0;">camera</span>
+</a>
+<a aria-label="Settings" class="flex flex-col items-center justify-center text-on-surface-variant w-12 h-12 hover:text-primary transition-all" href="#">
+<span class="material-symbols-outlined" data-icon="settings" style="font-variation-settings: 'FILL' 0;">settings</span>
+</a>
+</div>
+</nav>
+</body></html>
