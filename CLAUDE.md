@@ -65,6 +65,7 @@ Landmark {
   visual_markers: string[]  // recognition cues — never rendered as a fact
   category: Category        // display + filtering only — NEVER sent to recognition
   tags?: string[]           // optional keywords, same rule as category
+  city?: string             // display + filtering only, same rule
 }
 
 Category =
@@ -87,6 +88,33 @@ MatchResult {
 
 Adding a landmark is a **data** operation. It means appending to
 `landmarks.json`. It never means changing code.
+
+### Curated vs listed
+
+The library holds 190 landmarks across 19 cities, but only the ones with
+**`visual_markers`** are offered to recognition. `selectCandidates()` filters
+on `isRecognisable()`, and that filter is load bearing: handing the matcher a
+candidate it has no way to identify invites it to pick on name or category
+alone — a confident wrong match, the one failure this product exists to
+prevent.
+
+So an entry has two tiers, and the difference is `visual_markers`:
+
+| Tier | Appears in discovery | Has a story page | Offered to recognition |
+|---|---|---|---|
+| Listed (no markers) | yes | yes | **no** |
+| Curated (has markers) | yes | yes | yes |
+
+Promoting an entry means writing 3–5 concrete, visually checkable markers for
+it. Nothing else.
+
+### Translation pending
+
+`name_ar` and one side of a `Fact` may be an empty string while a translation
+is pending. A fact must still carry text in **at least one** language, and
+always its source. `<SourcedFact/>` renders the language we have and labels it
+"translation pending" — it never machine-translates the missing one into
+existence, and never renders a blank where a fact should be.
 
 `category` is a fixed union, so a typo fails to compile in our own code — and
 because `landmarks.json` is data the compiler never sees, `loadLandmarks()`

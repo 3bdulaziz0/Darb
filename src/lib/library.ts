@@ -89,9 +89,13 @@ export function parseLandmarks(data: unknown): Landmark[] {
     }
 
     requireString(l.id, `${where}.id`);
-    requireString(l.name_ar, `${where}.name_ar`);
     requireString(l.name_en, `${where}.name_en`);
     requireString(l.image, `${where}.image`);
+    // name_ar may be empty while a translation is pending — but it must still
+    // be a string, not missing or a number.
+    if (typeof l.name_ar !== 'string') {
+      throw new Error(`${where}.name_ar must be a string (empty is allowed while untranslated).`);
+    }
 
     requireLatitude(l.lat, `${where}.lat`);
     requireLongitude(l.lng, `${where}.lng`);
@@ -121,8 +125,13 @@ export function parseLandmarks(data: unknown): Landmark[] {
       if (typeof fact !== 'object' || fact === null) {
         throw new Error(`${at} is not an object.`);
       }
-      requireString(fact.text_ar, `${at}.text_ar`);
-      requireString(fact.text_en, `${at}.text_en`);
+      if (typeof fact.text_ar !== 'string' || typeof fact.text_en !== 'string') {
+        throw new Error(`${at}.text_ar and .text_en must both be strings.`);
+      }
+      // One language may be pending, but a fact empty in both says nothing.
+      if (!fact.text_ar.trim() && !fact.text_en.trim()) {
+        throw new Error(`${at} has no text in either language.`);
+      }
       // RULE 2 at the door: a fact without a resolvable source is not data we
       // are willing to hold, let alone render.
       requireString(fact.source_name, `${at}.source_name`);
@@ -196,8 +205,8 @@ export function distanceKm(a: Coordinates, b: Coordinates): number {
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
 }
 
-/** Every landmark paired with its distance from the user, nearest first. */
-function sortedByDistance(
+/** Every landmark paired with its distance from a point, nearest first. */
+export function withDistance(
   landmarks: Landmark[],
   userLat: number,
   userLng: number,
@@ -226,7 +235,7 @@ export function nearby(
   userLng: number,
   radiusKm: number,
 ): LandmarkWithDistance[] {
-  return sortedByDistance(landmarks, userLat, userLng).filter(
+  return withDistance(landmarks, userLat, userLng).filter(
     (r) => r.distance_km <= radiusKm,
   );
 }
@@ -245,16 +254,32 @@ export function nearestCoveredArea(
   userLat: number,
   userLng: number,
 ): LandmarkWithDistance | null {
-  return sortedByDistance(landmarks, userLat, userLng)[0] ?? null;
+  return withDistance(landmarks, userLat, userLng)[0] ?? null;
+}
+
+/**
+ * True if we have anything to recognise this landmark BY.
+ *
+ * An entry with no visual_markers can be listed, filtered and read — but there
+ * is nothing to match a photograph against.
+ */
+export function isRecognisable(landmark: Landmark): boolean {
+  return landmark.visual_markers.length > 0;
 }
 
 /**
  * The ids recognition is allowed to choose from — everything within
- * `radiusKm` of the user, nearest first.
+ * `radiusKm` of the user that we can actually identify, nearest first.
  *
  * Narrowing by GPS before matching is what turns "identify any building on
  * Earth" into "pick one of these four". Recognition must never return an id
  * that is not in this list.
+ *
+ * Entries with no visual_markers are excluded, and that exclusion is load
+ * bearing. Handing the matcher a candidate it has no way to identify invites
+ * it to pick on name or category alone — a confident wrong match, which is
+ * the one failure this product exists to prevent. An uncurated entry is
+ * something we can show on a map, not something we claim to recognise.
  */
 export function selectCandidates(
   landmarks: Landmark[],
@@ -262,7 +287,9 @@ export function selectCandidates(
   userLng: number,
   radiusKm: number,
 ): string[] {
-  return nearby(landmarks, userLat, userLng, radiusKm).map((r) => r.landmark.id);
+  return nearby(landmarks.filter(isRecognisable), userLat, userLng, radiusKm).map(
+    (r) => r.landmark.id,
+  );
 }
 
 // ── Rule 2: sealing ─────────────────────────────────────────────────────────

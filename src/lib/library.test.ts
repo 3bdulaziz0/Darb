@@ -17,6 +17,7 @@ import { describe, expect, it } from 'vitest';
 import {
   distanceKm,
   formatDistance,
+  isRecognisable,
   nearby,
   nearestCoveredArea,
   parseLandmarks,
@@ -150,6 +151,30 @@ describe('selectCandidates', () => {
     // An empty candidate set must resolve to a refusal, never a wider search.
     expect(selectCandidates(LIBRARY, RIYADH.lat, RIYADH.lng, 1)).toEqual([]);
   });
+
+  it('excludes landmarks that have no visual markers', () => {
+    // The bulk of the library is uncurated: listable, but not identifiable.
+    // Offering one as a candidate invites a match made on name alone.
+    const uncurated = makeLandmark({ id: 'lm_bare', visual_markers: [], lat: 21.4839, lng: 39.1867 });
+    const ids = selectCandidates([...LIBRARY, uncurated], JEDDAH.lat, JEDDAH.lng, 5);
+    expect(ids).not.toContain('lm_bare');
+    expect(ids).toEqual(['lm_01', 'lm_02']);
+  });
+
+  it('returns nothing when every nearby landmark is uncurated', () => {
+    const bare = [makeLandmark({ id: 'lm_bare', visual_markers: [] })];
+    expect(selectCandidates(bare, JEDDAH.lat, JEDDAH.lng, 5)).toEqual([]);
+  });
+});
+
+describe('isRecognisable', () => {
+  it('is true when the entry has visual markers', () => {
+    expect(isRecognisable(makeLandmark())).toBe(true);
+  });
+
+  it('is false when it has none', () => {
+    expect(isRecognisable(makeLandmark({ visual_markers: [] }))).toBe(false);
+  });
 });
 
 // ── parseLandmarks ──────────────────────────────────────────────────────────
@@ -204,6 +229,30 @@ describe('parseLandmarks', () => {
 
   it('rejects tags that are not strings', () => {
     expect(() => parseLandmarks([makeLandmark({ tags: [42] as never })])).toThrow(/tags/);
+  });
+
+  it('accepts an empty name_ar, because translations arrive later', () => {
+    expect(() => parseLandmarks([makeLandmark({ name_ar: '' })])).not.toThrow();
+  });
+
+  it('still rejects a name_ar that is missing entirely', () => {
+    const missing = makeLandmark();
+    delete (missing as Partial<Landmark>).name_ar;
+    expect(() => parseLandmarks([missing])).toThrow(/name_ar/);
+  });
+
+  it('accepts a fact that has text in only one language', () => {
+    const enOnly = makeLandmark({
+      facts: [{ text_ar: '', text_en: 'text', source_name: 'S', source_url: 'https://e.org' }],
+    });
+    expect(() => parseLandmarks([enOnly])).not.toThrow();
+  });
+
+  it('rejects a fact that is empty in both languages', () => {
+    const blank = makeLandmark({
+      facts: [{ text_ar: '  ', text_en: '', source_name: 'S', source_url: 'https://e.org' }],
+    });
+    expect(() => parseLandmarks([blank])).toThrow(/no text in either language/);
   });
 
   it('rejects two landmarks sharing an id', () => {

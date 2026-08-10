@@ -23,8 +23,9 @@
 import { useEffect, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { SourcedFact } from '../components/SourceBadge';
+import { PHOTO_PENDING } from '../components/LandmarkCard';
 import { categoryColor, categoryLabel } from '../lib/categories';
-import { getLandmark, loadLandmarks, sealFacts } from '../lib/library';
+import { getLandmark, loadLandmarks, sealFacts, withDistance } from '../lib/library';
 import { MOCK_ELEMENT_LABELS, MOCK_LANG } from '../lib/mockData';
 import type { Landmark, SealedFact } from '../lib/types';
 
@@ -86,8 +87,18 @@ export default function StoryPage() {
       setLandmark(found);
       setFacts(sealFacts(found));
 
+      // Up to 3 nearest, measured from the landmark you are reading about
+      // (Epic 5). The library spans 19 cities now — without the cap this rail
+      // would render every entry we have.
       const all = await loadLandmarks();
-      if (live) setNearby(all.filter((l) => l.id !== found.id));
+      if (live) {
+        setNearby(
+          withDistance(all, found.lat, found.lng)
+            .filter((r) => r.landmark.id !== found.id)
+            .slice(0, 3)
+            .map((r) => r.landmark),
+        );
+      }
     })();
 
     return () => {
@@ -110,7 +121,9 @@ export default function StoryPage() {
     return <div className="flex h-full items-center justify-center text-muted">Loading…</div>;
   }
 
-  const name = lang === 'ar' ? landmark.name_ar : landmark.name_en;
+  // Falls back to the language we have — most of the library is English-only
+  // until teammate D's translation pass (T-2).
+  const name = (lang === 'ar' ? landmark.name_ar : landmark.name_en) || landmark.name_en;
   const secondary = lang === 'ar' ? landmark.name_en : landmark.name_ar;
 
   return (
@@ -120,6 +133,9 @@ export default function StoryPage() {
         <img
           src={capturedImage ?? landmark.image}
           alt=""
+          onError={(e) => {
+            e.currentTarget.src = PHOTO_PENDING;
+          }}
           className="h-full w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent" />

@@ -14,6 +14,9 @@ import { Link } from 'react-router-dom';
 import type { Lang, Landmark } from '../lib/types';
 import { formatDistance } from '../lib/library';
 
+/** Shown wherever a landmark's photo has not been taken yet. */
+export const PHOTO_PENDING = '/images/placeholder.jpg';
+
 function DirectionsIcon() {
   return (
     <svg
@@ -41,7 +44,9 @@ export default function LandmarkCard({
   distanceKm?: number;
   lang: Lang;
 }) {
-  const name = lang === 'ar' ? landmark.name_ar : landmark.name_en;
+  // Most of the library is not translated yet. Fall back to the language we
+  // have rather than rendering a blank row.
+  const name = (lang === 'ar' ? landmark.name_ar : landmark.name_en) || landmark.name_en;
   const secondary = lang === 'ar' ? landmark.name_en : landmark.name_ar;
 
   return (
@@ -53,6 +58,11 @@ export default function LandmarkCard({
       <img
         src={landmark.image}
         alt=""
+        loading="lazy"
+        // Most library photos have not been shot yet.
+        onError={(e) => {
+          e.currentTarget.src = PHOTO_PENDING;
+        }}
         className="h-16 w-16 shrink-0 rounded-ctl object-cover"
       />
 

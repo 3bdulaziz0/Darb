@@ -62,12 +62,33 @@ export function SourceBadge({ name, url }: { name: string; url: string }) {
  * fact text without its source, because there is nowhere else to unwrap it.
  */
 export function SourcedFact({ fact, lang }: { fact: SealedFact; lang: Lang }) {
-  const sourced = lang === 'ar' ? fact.text_ar : fact.text_en;
+  const preferred = lang === 'ar' ? fact.text_ar : fact.text_en;
+  const other = lang === 'ar' ? fact.text_en : fact.text_ar;
+
+  // Some library entries carry only one language so far. Show the language we
+  // actually have and say so — never machine-translate the missing one into
+  // existence, and never show a blank where a fact should be.
+  const pending = preferred.text.trim() === '';
+  const sourced = pending ? other : preferred;
 
   return (
     <div className="flex flex-col items-start gap-2">
-      <p className="text-body text-white/90">{sourced.text}</p>
-      <SourceBadge name={sourced.source_name} url={sourced.source_url} />
+      <p
+        className="text-body text-white/90"
+        dir={sourced === fact.text_ar ? 'rtl' : 'ltr'}
+      >
+        {sourced.text}
+      </p>
+
+      <div className="flex flex-wrap items-center gap-2">
+        <SourceBadge name={sourced.source_name} url={sourced.source_url} />
+        {pending && (
+          <span className="flex min-h-[32px] items-center rounded-full border border-sand/30
+                           bg-sand/10 px-3 label-caps text-sand">
+            {lang === 'ar' ? 'الترجمة قيد الإعداد' : 'Translation pending'}
+          </span>
+        )}
+      </div>
     </div>
   );
 }

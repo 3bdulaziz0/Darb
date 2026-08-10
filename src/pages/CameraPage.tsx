@@ -21,7 +21,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StatusIndicator from '../components/StatusIndicator';
-import { loadLandmarks, selectCandidates } from '../lib/library';
+import { isRecognisable, loadLandmarks, selectCandidates } from '../lib/library';
 import { getPosition } from '../lib/location';
 import { recognize } from '../lib/recognize';
 import { isForcedNoMatch, setForcedNoMatch } from '../lib/mockData';
@@ -390,10 +390,12 @@ export default function CameraPage() {
         // back to the whole library rather than guessing a position — fewer
         // candidates chosen from the wrong place is worse than more from the
         // right one.
+        // Either way, only entries we can actually identify are offered —
+        // see isRecognisable() in library.ts for why that matters.
         const candidate_ids =
           capture.lat !== null && capture.lng !== null
             ? selectCandidates(library, capture.lat, capture.lng, CANDIDATE_RADIUS_KM)
-            : library.map((l) => l.id);
+            : library.filter(isRecognisable).map((l) => l.id);
 
         if (abandonedRef.current) return;
         setStage('matching');

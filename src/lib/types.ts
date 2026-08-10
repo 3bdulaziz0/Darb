@@ -11,6 +11,10 @@
  *   day 2 — added Landmark.category (required) and Landmark.tags (optional).
  *           Adding `category` means every entry in landmarks.json must carry
  *           one; loadLandmarks() rejects the file otherwise.
+ *   day 2 — added Landmark.city (optional). Relaxed name_ar and Fact.text_ar
+ *           to allow an empty string while a translation is pending, because
+ *           the bulk library arrived English-only. A fact must still carry
+ *           text in at least one language, and always its source.
  */
 
 // ── Language ────────────────────────────────────────────────────────────────
@@ -20,6 +24,12 @@ export type Lang = 'ar' | 'en';
 // ── Data contract (fixed — mirrors public/landmarks.json exactly) ───────────
 
 export interface Fact {
+  /**
+   * The fact in each language. One of the two may be an empty string while a
+   * translation is pending — the UI then shows the language we do have, with a
+   * "translation pending" label. It never machine-translates the other one
+   * into existence, and never renders a fact that is empty in both.
+   */
   text_ar: string;
   text_en: string;
   source_name: string;
@@ -44,6 +54,7 @@ export type Category =
 
 export interface Landmark {
   id: string;
+  /** May be empty while a translation is pending. Never invented. */
   name_ar: string;
   name_en: string;
   lat: number;
@@ -65,6 +76,12 @@ export interface Landmark {
   category: Category;
   /** Optional free-text keywords. Display and search only, same rule as above. */
   tags?: string[];
+  /**
+   * Which city the landmark is in. The library outgrew a single district, and
+   * the discovery screen has to be able to say where our coverage actually is.
+   * Display and filtering only, same rule as category.
+   */
+  city?: string;
 }
 
 /**

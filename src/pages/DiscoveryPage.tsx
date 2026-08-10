@@ -106,6 +106,12 @@ export default function DiscoveryPage() {
     [inCategory, origin],
   );
 
+  /** How many cities the filtered library actually reaches. */
+  const cityCount = useMemo(
+    () => new Set(inCategory.map((l) => l.city).filter(Boolean)).size,
+    [inCategory],
+  );
+
   const label = category === 'all' ? null : categoryLabel(category, lang);
   /** "3 heritage landmarks" / "3 landmarks" */
   const noun = (n: number) => `${n} ${label ? `${label.toLowerCase()} ` : ''}landmark${n === 1 ? '' : 's'}`;
@@ -214,7 +220,9 @@ export default function DiscoveryPage() {
             <p className="mb-6 text-body text-muted">
               {inCategory.length === 0
                 ? `Our library doesn't cover any ${label?.toLowerCase()} landmarks yet.`
-                : `Our library covers ${noun(inCategory.length)} in the historic district.`}
+                : `Our library covers ${noun(inCategory.length)} across ${cityCount} ${
+                    cityCount === 1 ? 'city' : 'cities'
+                  }.`}
             </p>
 
             {nearest && (
@@ -225,9 +233,11 @@ export default function DiscoveryPage() {
               >
                 <span>
                   <span className="block text-body text-white">
-                    {lang === 'ar' ? nearest.landmark.name_ar : nearest.landmark.name_en}
+                    {(lang === 'ar' ? nearest.landmark.name_ar : nearest.landmark.name_en) ||
+                      nearest.landmark.name_en}
                   </span>
                   <span className="label-caps text-sand">
+                    {nearest.landmark.city ? `${nearest.landmark.city} · ` : ''}
                     {formatDistance(nearest.distance_km)}
                   </span>
                 </span>
