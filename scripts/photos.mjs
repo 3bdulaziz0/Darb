@@ -36,6 +36,8 @@ let totalPhotos = 0;
 let totalBytes = 0;
 const oversized = [];
 const missing = [];
+/** Folders with photos whose landmark is not flagged test_ready. */
+const heldBack = [];
 
 for (const landmark of landmarks) {
   const dir = join(PHOTOS, landmark.id);
@@ -72,6 +74,16 @@ for (const landmark of landmarks) {
   const imageIsDead =
     !landmark.image || !existsSync(join(ROOT, 'public', landmark.image.replace(/^\//, '')));
 
+  // Photos on disk are not the same thing as photos in the test set. Only
+  // entries a human has flagged `test_ready` get linked, so dropping a folder
+  // of images in never silently enlarges what recognition is judged on.
+  if (files.length > 0 && !landmark.test_ready) {
+    delete landmark.reference_images;
+    if (imageIsOurs) landmark.image = PLACEHOLDER;
+    heldBack.push({ id: landmark.id, count: files.length });
+    continue;
+  }
+
   if (files.length > 0) {
     landmark.reference_images = files.map((name) => `${ours}${name}`);
     // The first photo becomes the one shown on the card and the story page,
@@ -101,6 +113,15 @@ console.log(`with photos            : ${withPhotos}`);
 console.log(`without photos         : ${missing.length}`);
 console.log(`photos on disk         : ${totalPhotos} (${(totalBytes / 1024 / 1024).toFixed(1)} MB)`);
 console.log(`recognisable by the AI : ${landmarks.filter(recognisable).length}`);
+console.log(`flagged test_ready     : ${landmarks.filter((l) => l.test_ready).length}`);
+
+if (heldBack.length) {
+  const total = heldBack.reduce((n, h) => n + h.count, 0);
+  console.log('');
+  console.log(`${total} photo(s) in ${heldBack.length} folder(s) are on disk but NOT linked,`);
+  console.log('because those landmarks are not flagged test_ready. Add');
+  console.log('"test_ready": true to an entry in landmarks.json to bring it in.');
+}
 
 if (oversized.length) {
   console.log('');

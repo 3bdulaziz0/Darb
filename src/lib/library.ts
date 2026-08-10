@@ -125,6 +125,10 @@ export function parseLandmarks(data: unknown): Landmark[] {
       requireStringArray(l.reference_images, `${where}.reference_images`);
     }
 
+    if (l.test_ready !== undefined && typeof l.test_ready !== 'boolean') {
+      throw new Error(`${where}.test_ready must be true or false.`);
+    }
+
     if (!Array.isArray(l.facts)) {
       throw new Error(`${where}.facts must be an array.`);
     }

@@ -108,7 +108,14 @@ So an entry has two tiers, and the difference is `visual_markers`:
 | Curated (has markers) | yes | yes | yes |
 
 Promoting an entry means giving it something to be recognised BY — written
-`visual_markers`, reference photographs, or both.
+`visual_markers`, reference photographs, or both — **and** flagging it
+`"test_ready": true`.
+
+The flag is a curation decision, not a place type, which is why it is separate
+from `category`. `npm run photos` links reference photographs for flagged
+entries only, so dropping a folder of images in never silently enlarges what
+the matcher is judged on. Photos for unflagged landmarks sit on disk, are
+gitignored, and the script reports how many are waiting.
 
 Photos live in `public/landmarks/<id>/`, one folder per landmark. Drop the
 files in and run `npm run photos`; the script writes `reference_images` into

@@ -100,6 +100,19 @@ export interface Landmark {
    * Display and filtering only, same rule as category.
    */
   city?: string;
+  /**
+   * Cleared for recognition testing.
+   *
+   * A curation decision, not a place type — it says "a human checked this
+   * entry's photos and markers and is willing to have the matcher judged on
+   * it", which is why it is separate from `category`.
+   *
+   * `npm run photos` links reference photographs for flagged entries only, so
+   * an entry with photos on disk but no flag stays out of recognition. That
+   * keeps the test set small and deliberate instead of growing every time
+   * somebody drops a folder of images in.
+   */
+  test_ready?: boolean;
 }
 
 /**

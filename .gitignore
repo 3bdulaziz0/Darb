@@ -23,3 +23,16 @@ Thumbs.db
 # Copied third-party skill packs — not part of this project, and their
 # licences are not ours to redistribute. Keep them local.
 .claude/skills/
+
+# Reference photos are committed only for landmarks flagged `test_ready`,
+# which are force-added below the ignore. Photos for everything else stay on
+# your disk until someone flags that landmark — binaries are permanent once
+# they are in git history, so we only pay for the ones we actually use.
+#
+#   to include a landmark's photos:  set "test_ready": true in landmarks.json,
+#   run `npm run photos`, then `git add -f public/landmarks/<id>`
+public/landmarks/*/*.jpg
+public/landmarks/*/*.jpeg
+public/landmarks/*/*.png
+public/landmarks/*/*.webp
+public/landmarks/*/*.avif
