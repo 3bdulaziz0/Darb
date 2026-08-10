@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+
+  body {
+    @apply bg-bg text-white font-sans antialiased;
+    /* The camera view owns the screen; the page itself never scrolls. */
+    overscroll-behavior: none;
+  }
+}
+
+@layer components {
+  /* Uppercase archival metadata — Space Grotesk, wide tracking. */
+  .label-caps {
+    @apply font-label text-label uppercase;
+  }
+
+  /* Level-1 glass: translucent surface over the camera feed. */
+  .glass {
+    @apply bg-surface/60 backdrop-blur-glass border border-hairline;
+  }
+
+  /* Circular control that always meets the 44px touch minimum. */
+  .control {
+    @apply h-touch w-touch flex items-center justify-center rounded-full;
+  }
+
+  .scroll-area {
+    @apply overflow-y-auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .scroll-area::-webkit-scrollbar {
+    display: none;
+  }
+}

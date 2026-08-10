@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Heritage Landmark Camera Guide</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&amp;family=Space+Grotesk:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-container": "#f1eaff",
+                        "primary": "#c9beff",
+                        "tertiary": "#ffb68b",
+                        "secondary-fixed-dim": "#dec395",
+                        "inverse-surface": "#e4e1e7",
+                        "on-tertiary-fixed": "#321300",
+                        "surface-bright": "#39393d",
+                        "on-secondary-fixed-variant": "#574421",
+                        "secondary-container": "#594623",
+                        "on-background": "#e4e1e7",
+                        "on-primary-fixed-variant": "#4612cf",
+                        "surface-dim": "#131317",
+                        "on-error-container": "#ffdad6",
+                        "surface-container-high": "#2a292e",
+                        "primary-container": "#6c4bf4",
+                        "on-primary-fixed": "#1b0063",
+                        "surface-variant": "#353439",
+                        "on-secondary-fixed": "#271900",
+                        "background": "#131317",
+                        "on-primary": "#30009b",
+                        "outline-variant": "#484555",
+                        "outline": "#938ea1",
+                        "on-error": "#690005",
+                        "inverse-on-surface": "#303034",
+                        "surface": "#131317",
+                        "secondary": "#dec395",
+                        "on-tertiary": "#522300",
+                        "surface-tint": "#c9beff",
+                        "secondary-fixed": "#fcdfaf",
+                        "surface-container-lowest": "#0e0e12",
+                        "primary-fixed": "#e6deff",
+                        "error-container": "#93000a",
+                        "error": "#ffb4ab",
+                        "surface-container": "#1f1f23",
+                        "primary-fixed-dim": "#c9beff",
+                        "tertiary-fixed": "#ffdbc8",
+                        "on-secondary-container": "#d0b588",
+                        "tertiary-container": "#ad5100",
+                        "on-tertiary-fixed-variant": "#743400",
+                        "on-surface-variant": "#c9c4d8",
+                        "tertiary-fixed-dim": "#ffb68b",
+                        "surface-container-highest": "#353439",
+                        "on-tertiary-container": "#ffe9de",
+                        "on-secondary": "#3e2e0c",
+                        "inverse-primary": "#5f3be6",
+                        "on-surface": "#e4e1e7",
+                        "surface-container-low": "#1b1b1f"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "touch-target-min": "44px",
+                        "stack-md": "24px",
+                        "stack-sm": "8px",
+                        "gutter": "16px",
+                        "margin-mobile": "20px",
+                        "stack-lg": "48px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Manrope"],
+                        "display-lg-mobile": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "label-caps": ["Space Grotesk"],
+                        "caption": ["Manrope"],
+                        "display-lg": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "caption": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .glass-panel {
+            background-color: rgba(26, 26, 34, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+        .ghost-border {
+            border: 1px solid rgba(160, 160, 174, 0.2);
+        }
+        /* Hide scrollbar for clean aesthetic */
+        ::-webkit-scrollbar {
+            display: none;
+        }
+        * {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface font-body-md h-screen w-screen overflow-hidden relative selection:bg-primary-container selection:text-on-primary-container">
+<!-- Background Camera Feed -->
+<div class="absolute inset-0 z-0">
+<img alt="" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAynzXWll3HQAi0t9DYcXhqHfqAkPgxwUpsjkFHzrjgfq6SnKP2w5j1w0Yvdz-iJhVHLEvWsRamO4djfUPRiZfstw02SXPaLTwp8EV4w2nXdu3gNil8CTNWrbEVIkz7Izz504bEROgAD90C6zAkgJ5zbK0xon8KTx37wR-Jk4SfjfpUiMIdrVGd0Ygpq2Aka7l2CtQ61THkmJruZpmLPednZCT5V4l0ebnUrQmIJS1tnraITrZBdCa2"/>
+<!-- Optional subtle gradient overlay for text legibility if needed, but keeping it minimal as requested -->
+<div class="absolute inset-0 bg-gradient-to-b from-surface/20 via-transparent to-surface/40 pointer-events-none"></div>
+</div>
+<!-- Top Navigation / Status Area -->
+<div class="absolute top-0 left-0 w-full z-10 flex justify-between items-start pt-margin-mobile px-margin-mobile">
+<!-- Location Pill -->
+<div class="glass-panel ghost-border rounded-full flex items-center px-4 h-10 shadow-none">
+<span class="material-symbols-outlined text-[18px] mr-2 text-on-surface" style="font-variation-settings: 'FILL' 0;">location_on</span>
+<span class="font-label-caps text-label-caps text-on-surface uppercase tracking-widest">District Landmark</span>
+</div>
+<!-- Language Toggle -->
+<button aria-label="Toggle Language" class="glass-panel ghost-border rounded-full flex items-center justify-center w-touch-target-min h-touch-target-min shadow-none hover:bg-surface-variant transition-colors">
+<span class="font-label-caps text-label-caps text-on-surface">EN</span>
+</button>
+</div>
+<!-- Center Framing Guide -->
+<div class="absolute inset-0 z-10 flex flex-col items-center justify-center pointer-events-none">
+<!-- Bracket Frame -->
+<div class="relative w-64 h-64 md:w-80 md:h-80 opacity-70">
+<!-- Top Left -->
+<div class="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-on-surface"></div>
+<!-- Top Right -->
+<div class="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-on-surface"></div>
+<!-- Bottom Left -->
+<div class="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-on-surface"></div>
+<!-- Bottom Right -->
+<div class="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-on-surface"></div>
+</div>
+<!-- Helper Text -->
+<p class="mt-stack-md font-body-md text-body-md text-on-surface opacity-80 shadow-none text-center px-4 py-2 glass-panel rounded-lg ghost-border">
+            Point at a landmark
+        </p>
+</div>
+<!-- Bottom Action Area -->
+<div class="absolute bottom-0 left-0 w-full z-20 pb-margin-mobile px-margin-mobile flex justify-between items-center bg-gradient-to-t from-surface/60 to-transparent pt-12">
+<!-- Discover Nearby Button -->
+<button aria-label="Discover nearby" class="glass-panel ghost-border rounded-full flex items-center justify-center w-touch-target-min h-touch-target-min shadow-none hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface" style="font-variation-settings: 'FILL' 0;">map</span>
+</button>
+<!-- Main Capture Button -->
+<button aria-label="Analyze Landmark" class="relative flex items-center justify-center w-20 h-20 rounded-full border-4 border-on-surface hover:scale-95 transition-transform group">
+<div class="absolute inset-2 rounded-full bg-primary-container transition-transform group-hover:scale-90"></div>
+</button>
+<!-- Settings Button -->
+<button aria-label="Settings" class="glass-panel ghost-border rounded-full flex items-center justify-center w-touch-target-min h-touch-target-min shadow-none hover:bg-surface-variant transition-colors">
+<span class="material-symbols-outlined text-on-surface" style="font-variation-settings: 'FILL' 0;">settings</span>
+</button>
+</div>
+</body></html>

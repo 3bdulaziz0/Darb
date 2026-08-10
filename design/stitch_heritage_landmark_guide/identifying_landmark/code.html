@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Processing Landmark</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&amp;family=Space+Grotesk:wght@500&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-primary-fixed": "#1b0063",
+                        "tertiary-fixed": "#ffdbc8",
+                        "inverse-primary": "#5f3be6",
+                        "surface-container-highest": "#353439",
+                        "on-primary-container": "#f1eaff",
+                        "background": "#131317",
+                        "tertiary": "#ffb68b",
+                        "primary-container": "#6c4bf4",
+                        "primary-fixed-dim": "#c9beff",
+                        "surface-container-lowest": "#0e0e12",
+                        "outline-variant": "#484555",
+                        "outline": "#938ea1",
+                        "on-secondary-fixed-variant": "#574421",
+                        "surface-container-low": "#1b1b1f",
+                        "on-tertiary-fixed-variant": "#743400",
+                        "on-tertiary-fixed": "#321300",
+                        "secondary": "#dec395",
+                        "secondary-fixed-dim": "#dec395",
+                        "error-container": "#93000a",
+                        "on-primary-fixed-variant": "#4612cf",
+                        "on-tertiary-container": "#ffe9de",
+                        "on-tertiary": "#522300",
+                        "on-background": "#e4e1e7",
+                        "on-primary": "#30009b",
+                        "primary-fixed": "#e6deff",
+                        "on-error-container": "#ffdad6",
+                        "surface-bright": "#39393d",
+                        "surface-variant": "#353439",
+                        "secondary-fixed": "#fcdfaf",
+                        "primary": "#c9beff",
+                        "on-secondary-container": "#d0b588",
+                        "inverse-surface": "#e4e1e7",
+                        "inverse-on-surface": "#303034",
+                        "on-secondary": "#3e2e0c",
+                        "on-error": "#690005",
+                        "surface-tint": "#c9beff",
+                        "surface": "#131317",
+                        "on-surface-variant": "#c9c4d8",
+                        "surface-container": "#1f1f23",
+                        "tertiary-container": "#ad5100",
+                        "tertiary-fixed-dim": "#ffb68b",
+                        "surface-dim": "#131317",
+                        "on-secondary-fixed": "#271900",
+                        "on-surface": "#e4e1e7",
+                        "error": "#ffb4ab",
+                        "surface-container-high": "#2a292e",
+                        "secondary-container": "#594623",
+                        "text-secondary": "#A0A0AE"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "touch-target-min": "44px",
+                        "stack-lg": "48px",
+                        "stack-sm": "8px",
+                        "margin-desktop": "64px",
+                        "stack-md": "24px",
+                        "gutter": "16px",
+                        "margin-mobile": "20px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Manrope"],
+                        "display-lg-mobile": ["Manrope"],
+                        "display-lg": ["Manrope"],
+                        "label-caps": ["Space Grotesk"],
+                        "headline-md": ["Manrope"],
+                        "caption": ["Manrope"],
+                        "body-md": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", { "lineHeight": "28px", "fontWeight": "400" }],
+                        "display-lg-mobile": ["32px", { "lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "display-lg": ["48px", { "lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.1em", "fontWeight": "500" }],
+                        "headline-md": ["24px", { "lineHeight": "32px", "fontWeight": "600" }],
+                        "caption": ["14px", { "lineHeight": "20px", "fontWeight": "400" }],
+                        "body-md": ["16px", { "lineHeight": "24px", "fontWeight": "400" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
+        }
+        @keyframes pulse-ring {
+            0% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body class="bg-background text-on-surface min-h-screen relative overflow-hidden font-body-lg">
+<!-- Background Image -->
+<div class="absolute inset-0 z-0">
+<div class="absolute inset-0 bg-background/60 z-10"></div>
+<img alt="" class="w-full h-full object-cover blur-sm opacity-40" src="https://lh3.googleusercontent.com/aida/AP1WRLtfV5jb30rrXMWvQpJjsfoNAaHybzWjhMhCBixLqnXBBg1ruinKZad67ZoK-YPpgTAFcHUvUfxWCcTaMt3wJ-9eDaO_nnH-mGzyHOyTKo0zW95v7cFB300-8xz1W8dBbXHkLXk9P8xYyCne-nksNUDbq4lZhftO9tOvDoDcbUgLhOqm-PYbO3Cio_R_GhHtVtoWkWJr06sZIb31_ce4xYjwzojen5mqrPQajcsNUq1sR2YCTRccrpVwVNE"/>
+</div>
+<!-- Main Content -->
+<main class="relative z-20 flex flex-col items-center justify-center min-h-screen px-margin-mobile">
+<div class="flex flex-col items-start space-y-12 relative w-full max-w-sm">
+<!-- Connecting Line -->
+<div class="absolute left-6 top-8 bottom-8 w-px bg-outline-variant/30 -z-10"></div>
+<!-- Step 1: Completed -->
+<div class="flex items-center space-x-6 w-full">
+<div class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full bg-primary-container text-on-primary-container shadow-lg shadow-primary-container/20">
+<span class="material-symbols-outlined text-[24px]">check</span>
+</div>
+<div class="flex-1">
+<p class="font-body-lg text-body-lg text-on-surface">Locating you</p>
+</div>
+</div>
+<!-- Step 2: Active -->
+<div class="flex items-center space-x-6 w-full relative">
+<div class="w-12 h-12 flex-shrink-0 flex items-center justify-center relative">
+<div class="absolute inset-0 rounded-full border-2 border-primary-container pulse-ring"></div>
+<div class="w-6 h-6 rounded-full bg-primary-container z-10"></div>
+</div>
+<div class="flex-1">
+<p class="font-headline-md text-headline-md text-on-surface">Matching landmark</p>
+</div>
+</div>
+<!-- Step 3: Pending -->
+<div class="flex items-center space-x-6 w-full opacity-60">
+<div class="w-12 h-12 flex-shrink-0 flex items-center justify-center rounded-full border border-text-secondary/50 bg-surface-container/30">
+<div class="w-3 h-3 rounded-full bg-text-secondary/50"></div>
+</div>
+<div class="flex-1">
+<p class="font-body-lg text-body-lg text-text-secondary">Fetching the story</p>
+</div>
+</div>
+</div>
+<!-- Cancel Button -->
+<div class="absolute bottom-12 w-full flex justify-center px-margin-mobile">
+<button class="h-[touch-target-min] px-8 text-text-secondary font-label-caps text-label-caps tracking-widest uppercase hover:text-on-surface transition-colors duration-300">
+                Cancel
+            </button>
+</div>
+</main>
+</body></html>

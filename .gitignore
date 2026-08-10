@@ -1,0 +1,25 @@
+node_modules
+dist
+dist-ssr
+*.local
+.env
+.env.*
+!.env.example
+.vercel
+
+.DS_Store
+Thumbs.db
+
+.vscode/*
+!.vscode/extensions.json
+.idea
+
+# TypeScript incremental build cache
+*.tsbuildinfo
+
+# Machine-specific Claude Code settings (contains local absolute paths)
+.claude/settings.local.json
+
+# Copied third-party skill packs — not part of this project, and their
+# licences are not ours to redistribute. Keep them local.
+.claude/skills/

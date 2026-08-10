@@ -1,0 +1,90 @@
+[
+  {
+    "id": "lm_masmak",
+    "name_ar": "قصر المصمك",
+    "name_en": "Masmak Fort",
+    "category": "heritage",
+    "tags": ["museum", "outdoor", "city_center"],
+    "lat": 24.63111,
+    "lng": 46.71333,
+    "image": "/images/lm_masmak.jpg",
+    "elements": ["أبراج مراقبة", "بناء طيني", "بوابة خشبية"],
+    "visual_markers": [
+      "square clay and mud-brick fort with thick sand-colored walls",
+      "four cylindrical watchtowers, one at each corner",
+      "a large central tower with a crenellated top",
+      "a small heavy wooden door set into the main gate",
+      "open paved plaza surrounding the fort in central Riyadh"
+    ],
+    "facts": [
+      {
+        "text_ar": "حصن مبني من الطين واللبن، له أربعة أبراج مراقبة وجدران سميكة قائمة على أساس من كتل حجرية، ويقع في وسط الرياض في الأحياء القديمة.",
+        "text_en": "A clay and mud-brick fort with four watchtowers and thick walls founded on stone blocks, standing in the old quarter at the center of Riyadh.",
+        "source_name": "Wikipedia — Masmak Fort",
+        "source_url": "https://en.wikipedia.org/wiki/Masmak_Fort"
+      },
+      {
+        "text_ar": "بُني الحصن حوالي عام 1865 على يد عبدالرحمن بن سليمان بن دبعان، في عهد محمد بن عبدالله بن رشيد.",
+        "text_en": "The fort was built around 1865 by Abdulrahman ibn Sulaiman ibn Dabaan, during the rule of Mohammed ibn Abdullah ibn Rasheed.",
+        "source_name": "Wikipedia — Masmak Fort",
+        "source_url": "https://en.wikipedia.org/wiki/Masmak_Fort"
+      },
+      {
+        "text_ar": "في 14 يناير 1902 تمكّن عبدالعزيز بن عبدالرحمن آل سعود من الاستيلاء على الحصن من حامية آل رشيد، في الحدث المعروف باستعادة الرياض.",
+        "text_en": "On 14 January 1902 Abdulaziz bin Abdulrahman Al Saud captured the fort from its Rashid garrison, in the event known as the recapture of Riyadh.",
+        "source_name": "Wikipedia — Masmak Fort",
+        "source_url": "https://en.wikipedia.org/wiki/Masmak_Fort"
+      },
+      {
+        "text_ar": "يقع الحصن ضمن منطقة قصر الحكم، التي تضم عددًا من أبرز المعالم التراثية في الرياض.",
+        "text_en": "The fort sits within the Qasr Al-Hukm District, which holds several of Riyadh's most significant heritage landmarks.",
+        "source_name": "Wikipedia — Qasr Al-Hukm District",
+        "source_url": "https://en.wikipedia.org/wiki/Qasr_Al-Hukm_District"
+      }
+    ]
+  },
+  {
+    "id": "lm_elephant_rock",
+    "name_ar": "جبل الفيل",
+    "name_en": "Elephant Rock (Jabal AlFil)",
+    "category": "natural",
+    "tags": ["outdoor", "sunset", "family_friendly"],
+    "lat": 26.63,
+    "lng": 38.01,
+    "image": "/images/lm_elephant_rock.jpg",
+    "elements": ["حجر رملي", "تعرية طبيعية", "تكوين صخري"],
+    "visual_markers": [
+      "massive free-standing red sandstone formation shaped like an elephant",
+      "a thick rock arm resembling a trunk reaching down to the ground",
+      "wide flat desert sand surrounding the base with no buildings nearby",
+      "deep horizontal erosion lines across the rock body",
+      "isolated silhouette against open sky, no vegetation"
+    ],
+    "facts": [
+      {
+        "text_ar": "تكوين صخري طبيعي في العلا شمال غرب السعودية، يبلغ ارتفاعه 52 مترًا عند أعلى نقطة فيه.",
+        "text_en": "A natural rock formation in AlUla, north-western Saudi Arabia, measuring 52 metres at its highest point.",
+        "source_name": "Wikipedia — Elephant Rock",
+        "source_url": "https://en.wikipedia.org/wiki/Elephant_Rock_(Saudi_Arabia)"
+      },
+      {
+        "text_ar": "يتكوّن أساسًا من الحجر الرملي الذي تعرّض للتعرية على مدى ملايين السنين بفعل المطر والرياح والرمال حتى اتخذ شكل فيل.",
+        "text_en": "It is formed mainly of sandstone eroded over millions of years by rain, wind and sand until it took the shape of an elephant.",
+        "source_name": "Wikipedia — Elephant Rock",
+        "source_url": "https://en.wikipedia.org/wiki/Elephant_Rock_(Saudi_Arabia)"
+      },
+      {
+        "text_ar": "تكوّنت الصخور الرملية المحيطة بالعلا قبل نحو 540 إلى 485 مليون سنة، ثم ارتفعت قبل نحو 30 مليون سنة مع بداية انفتاح البحر الأحمر.",
+        "text_en": "The sandstones around AlUla formed roughly 540–485 million years ago and were uplifted about 30 million years ago as the Red Sea began to open.",
+        "source_name": "Wikipedia — Elephant Rock",
+        "source_url": "https://en.wikipedia.org/wiki/Elephant_Rock_(Saudi_Arabia)"
+      },
+      {
+        "text_ar": "يقع شرق موقع الحِجر الأثري، ويُعد أحد العجائب الجيولوجية في محافظة العلا.",
+        "text_en": "It lies east of the Hegra archaeological site and is considered one of AlUla Governorate's geological wonders.",
+        "source_name": "Saudipedia — Elephant Rock (Jabal AlFil)",
+        "source_url": "https://saudipedia.com/en/elephant-rock-jabal-alfil"
+      }
+    ]
+  }
+]
