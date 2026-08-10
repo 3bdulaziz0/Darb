@@ -19,11 +19,20 @@ import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LandmarkCard from '../components/LandmarkCard';
 import { CATEGORIES, categoryColor, categoryLabel } from '../lib/categories';
-import { formatDistance, loadLandmarks, nearby, nearestCoveredArea } from '../lib/library';
+import {
+  formatDistance,
+  loadLandmarks,
+  nearby,
+  nearestCoveredArea,
+  withDistance,
+} from '../lib/library';
 import { MOCK_LANG, MOCK_ORIGIN } from '../lib/mockData';
-import type { Category, Landmark, RadiusKm } from '../lib/types';
+import type { Category, DiscoveryScope, Landmark } from '../lib/types';
 
-const RADII: RadiusKm[] = [1, 5, 20];
+const SCOPES: DiscoveryScope[] = [1, 5, 20, 'all'];
+
+/** Rows rendered per step. 190 at once is a lot of DOM on a phone. */
+const PAGE_SIZE = 20;
 
 function CompassIcon() {
   return (
@@ -76,8 +85,10 @@ export default function DiscoveryPage() {
   const lang = MOCK_LANG;
 
   const [library, setLibrary] = useState<Landmark[]>([]);
-  const [radius, setRadius] = useState<RadiusKm>(5);
+  const [scope, setScope] = useState<DiscoveryScope>(5);
   const [category, setCategory] = useState<Category | 'all'>('all');
+  /** How many rows are on screen. Grows in PAGE_SIZE steps, never all at once. */
+  const [shown, setShown] = useState(PAGE_SIZE);
 
   // TODO(A/C): real coordinates from the Geolocation API (T-29).
   const origin = MOCK_ORIGIN;
@@ -94,10 +105,20 @@ export default function DiscoveryPage() {
     [library, category],
   );
 
+  // 'all' skips the radius filter but keeps the distance sort, so the nearest
+  // is still first — you just are not cut off at a boundary.
   const results = useMemo(
-    () => nearby(inCategory, origin.lat, origin.lng, radius),
-    [inCategory, origin, radius],
+    () =>
+      scope === 'all'
+        ? withDistance(inCategory, origin.lat, origin.lng)
+        : nearby(inCategory, origin.lat, origin.lng, scope),
+    [inCategory, origin, scope],
   );
+
+  // Changing either filter starts the list again from the top.
+  useEffect(() => {
+    setShown(PAGE_SIZE);
+  }, [scope, category]);
 
   // The nearest covered area respects the category filter too — offering a
   // museum to someone filtering for markets would not be an answer.
@@ -135,18 +156,18 @@ export default function DiscoveryPage() {
           aria-label="Search radius"
           className="mb-4 inline-flex rounded-full border border-hairline bg-surface p-1"
         >
-          {RADII.map((km) => (
+          {SCOPES.map((s) => (
             <button
-              key={km}
+              key={s}
               type="button"
-              onClick={() => setRadius(km)}
-              aria-pressed={radius === km}
+              onClick={() => setScope(s)}
+              aria-pressed={scope === s}
               className={[
-                'h-touch rounded-full px-5 text-body transition-colors',
-                radius === km ? 'bg-accent font-semibold text-white' : 'text-muted',
+                'h-touch shrink-0 rounded-full px-5 text-body transition-colors',
+                scope === s ? 'bg-accent font-semibold text-white' : 'text-muted',
               ].join(' ')}
             >
-              {km} KM
+              {s === 'all' ? 'All' : `${s} KM`}
             </button>
           ))}
         </div>
@@ -196,22 +217,45 @@ export default function DiscoveryPage() {
         {results.length > 0 ? (
           <>
             <p className="mb-4 text-body text-muted">
-              {noun(results.length)} within {radius} km
+              {scope === 'all'
+                ? `${noun(results.length)} across ${cityCount} ${cityCount === 1 ? 'city' : 'cities'}`
+                : `${noun(results.length)} within ${scope} km`}
             </p>
-            <ul className="flex flex-col gap-3 pb-6">
-              {results.map(({ landmark, distance_km }) => (
+
+            <ul className="flex flex-col gap-3">
+              {results.slice(0, shown).map(({ landmark, distance_km }) => (
                 <li key={landmark.id}>
                   <LandmarkCard landmark={landmark} distanceKm={distance_km} lang={lang} />
                 </li>
               ))}
             </ul>
+
+            {/* The whole library is 190 rows. Render a screenful at a time —
+                the sort is by distance, so the ones you can actually walk to
+                are always at the top. */}
+            {shown < results.length && (
+              <button
+                type="button"
+                onClick={() => setShown((n) => n + PAGE_SIZE)}
+                className="mt-4 flex h-14 w-full items-center justify-center rounded-ctl
+                           border border-hairline bg-surface text-body text-accent-soft"
+              >
+                Show {Math.min(PAGE_SIZE, results.length - shown)} more
+                <span className="ms-2 text-muted">
+                  ({shown} of {results.length})
+                </span>
+              </button>
+            )}
+
+            <div className="h-6" />
           </>
         ) : (
           // ── The honest empty state. Name the radius, name the coverage,
           //    point at the nearest covered area. Never pad the list.
           <div className="rounded-sheet border border-hairline bg-surface p-6 text-center">
             <h2 className="mb-2 text-headline text-white">
-              No verified {label ? `${label.toLowerCase()} ` : ''}landmarks within {radius} km
+              No verified {label ? `${label.toLowerCase()} ` : ''}landmarks
+              {scope === 'all' ? ' in the library' : ` within ${scope} km`}
             </h2>
 
             {/* Say which filter came up empty. "Nothing within 5 km" and
@@ -258,10 +302,12 @@ export default function DiscoveryPage() {
               </button>
             )}
 
-            {radius !== 20 && (
+            {/* Widening the radius only helps while there is a radius to
+                widen. On 'all' there is nowhere further to look. */}
+            {scope !== 'all' && (
               <button
                 type="button"
-                onClick={() => setRadius(20)}
+                onClick={() => setScope('all')}
                 className={[
                   'flex h-14 w-full items-center justify-center rounded-ctl text-body-lg',
                   category === 'all'
@@ -269,7 +315,7 @@ export default function DiscoveryPage() {
                     : 'border border-accent/60 text-accent-soft',
                 ].join(' ')}
               >
-                Search within 20 km
+                Show every landmark
               </button>
             )}
           </div>

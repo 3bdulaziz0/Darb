@@ -161,6 +161,17 @@ export interface Coordinates {
 /** The three radii offered on the discovery screen (Epic 6). */
 export type RadiusKm = 1 | 5 | 20;
 
+/**
+ * What the discovery list is scoped to: a radius around the visitor, or the
+ * whole library.
+ *
+ * 'all' exists because the library outgrew one district. A visitor in Riyadh
+ * has four landmarks within 5 km and 190 in the country, and there was no way
+ * to see the rest. Still sorted by true distance — 'all' widens the scope, it
+ * does not stop measuring.
+ */
+export type DiscoveryScope = RadiusKm | 'all';
+
 export interface LandmarkWithDistance {
   landmark: Landmark;
   distance_km: number;

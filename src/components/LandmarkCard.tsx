@@ -47,7 +47,12 @@ export default function LandmarkCard({
   // Most of the library is not translated yet. Fall back to the language we
   // have rather than rendering a blank row.
   const name = (lang === 'ar' ? landmark.name_ar : landmark.name_en) || landmark.name_en;
-  const secondary = lang === 'ar' ? landmark.name_en : landmark.name_ar;
+  const otherName = lang === 'ar' ? landmark.name_en : landmark.name_ar;
+
+  // The list now spans 19 cities, so where a landmark is matters as much as
+  // what it is called. City first — it is the part that orients you, and for
+  // an untranslated entry it is all this line would otherwise hold.
+  const secondary = [landmark.city, otherName].filter(Boolean).join(' · ');
 
   return (
     <Link
