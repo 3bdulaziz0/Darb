@@ -105,8 +105,14 @@ So an entry has two tiers, and the difference is `visual_markers`:
 | Listed (no markers) | yes | yes | **no** |
 | Curated (has markers) | yes | yes | yes |
 
-Promoting an entry means writing 3–5 concrete, visually checkable markers for
-it. Nothing else.
+Promoting an entry means giving it something to be recognised BY — written
+`visual_markers`, reference photographs, or both.
+
+Photos live in `public/landmarks/<id>/`, one folder per landmark. Drop the
+files in and run `npm run photos`; the script writes `reference_images` into
+`landmarks.json` and prints what is still missing. Never hand-edit that field.
+See `public/landmarks/README.md` — it is written for a curator, not a
+developer.
 
 ### Translation pending
 

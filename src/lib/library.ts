@@ -117,6 +117,12 @@ export function parseLandmarks(data: unknown): Landmark[] {
       requireStringArray(l.tags, `${where}.tags`);
     }
 
+    // Written by `npm run photos`, so a malformed value here means someone
+    // hand-edited it.
+    if (l.reference_images !== undefined) {
+      requireStringArray(l.reference_images, `${where}.reference_images`);
+    }
+
     if (!Array.isArray(l.facts)) {
       throw new Error(`${where}.facts must be an array.`);
     }
@@ -258,13 +264,14 @@ export function nearestCoveredArea(
 }
 
 /**
- * True if we have anything to recognise this landmark BY.
+ * True if we have anything to recognise this landmark BY — either written
+ * visual markers, or reference photographs, or both.
  *
- * An entry with no visual_markers can be listed, filtered and read — but there
- * is nothing to match a photograph against.
+ * An entry with neither can be listed, filtered and read. There is simply
+ * nothing to match a captured frame against, so we do not pretend otherwise.
  */
 export function isRecognisable(landmark: Landmark): boolean {
-  return landmark.visual_markers.length > 0;
+  return landmark.visual_markers.length > 0 || (landmark.reference_images?.length ?? 0) > 0;
 }
 
 /**

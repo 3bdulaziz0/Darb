@@ -59,7 +59,17 @@ export interface Landmark {
   name_en: string;
   lat: number;
   lng: number;
+  /** The photo shown on the card and the story page. */
   image: string;
+  /**
+   * Photos of this landmark from several angles, for the recogniser to match a
+   * captured frame against. Written by `npm run photos`, never by hand — drop
+   * files into public/landmarks/<id>/ and run it.
+   *
+   * Absent means we have no photo of this place yet, so we cannot claim to
+   * recognise it from one.
+   */
+  reference_images?: string[];
   facts: Fact[];
   /** Architectural element keys, e.g. "roshan". NOT historical claims. */
   elements: string[];
