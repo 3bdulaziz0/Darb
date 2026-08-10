@@ -20,14 +20,16 @@
  * The chips below show architectural elements from the library instead.
  */
 
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
-import { SourcedFact } from '../components/SourceBadge';
+import { SourceBadge, SourcedFact } from '../components/SourceBadge';
 import { PHOTO_PENDING } from '../components/LandmarkCard';
 import { categoryColor, categoryLabel } from '../lib/categories';
 import { getLandmark, loadLandmarks, sealFacts, withDistance } from '../lib/library';
 import { useLang } from '../lib/i18n';
 import { MOCK_ELEMENT_LABELS } from '../lib/mockData';
+import { ask } from '../lib/recognize';
+import { isSpeechAvailable, speak, stopSpeaking } from '../lib/speech';
 import type { Landmark, SealedFact } from '../lib/types';
 
 function BackIcon() {
@@ -43,6 +45,14 @@ function PlayIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6" fill="currentColor">
       <path d="M8 5.5v13l11-6.5-11-6.5Z" />
+    </svg>
+  );
+}
+
+function StopIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor">
+      <rect x="6" y="6" width="12" height="12" rx="2" />
     </svg>
   );
 }
@@ -70,6 +80,17 @@ export default function StoryPage() {
   const [facts, setFacts] = useState<SealedFact[]>([]);
   const [nearby, setNearby] = useState<Landmark[]>([]);
   const [missing, setMissing] = useState(false);
+
+  const [speaking, setSpeaking] = useState(false);
+  const [question, setQuestion] = useState('');
+  const [asking, setAsking] = useState(false);
+  const [answer, setAnswer] = useState<
+    | { kind: 'covered'; text: string; fact_indexes: number[] }
+    | { kind: 'uncovered' }
+    | { kind: 'failed' }
+    | null
+  >(null);
+  const answerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -106,6 +127,53 @@ export default function StoryPage() {
       live = false;
     };
   }, [id]);
+
+  // Read aloud exactly the sourced facts already on screen, joined. Nothing
+  // is written for narration, so nothing can be invented into it.
+  const narration = useMemo(
+    () =>
+      facts
+        .map((f) => (lang === 'ar' ? f.text_ar.text : f.text_en.text) || f.text_en.text)
+        .filter(Boolean)
+        .join(' '),
+    [facts, lang],
+  );
+
+  // Never leave a voice talking after the visitor has moved on.
+  useEffect(() => stopSpeaking, []);
+
+  function toggleSpeech() {
+    if (speaking) {
+      stopSpeaking();
+      setSpeaking(false);
+      return;
+    }
+    setSpeaking(true);
+    speak({ text: narration, lang, onEnd: () => setSpeaking(false) });
+  }
+
+  async function submitQuestion(e: React.FormEvent) {
+    e.preventDefault();
+    const q = question.trim();
+    if (!q || !landmark || asking) return;
+
+    setAsking(true);
+    setAnswer(null);
+    try {
+      const result = await ask(landmark.id, q, lang);
+      setAnswer(
+        result.covered
+          ? { kind: 'covered', text: result.answer, fact_indexes: result.fact_indexes }
+          : { kind: 'uncovered' },
+      );
+      setQuestion('');
+    } catch {
+      setAnswer({ kind: 'failed' });
+    } finally {
+      setAsking(false);
+      requestAnimationFrame(() => answerRef.current?.scrollIntoView({ behavior: 'smooth' }));
+    }
+  }
 
   if (missing) {
     return (
@@ -192,23 +260,31 @@ export default function StoryPage() {
           <div className="mb-8 flex items-center gap-4 rounded-ctl border border-hairline bg-surface-high/60 p-4">
             <button
               type="button"
-              disabled
-              aria-label="Play narration"
+              onClick={toggleSpeech}
+              disabled={!isSpeechAvailable() || !narration}
+              aria-label={speaking ? t('stopListening') : t('listen')}
               className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent
-                         text-white disabled:opacity-70"
+                         text-white transition-opacity disabled:opacity-40"
             >
-              <PlayIcon />
+              {speaking ? <StopIcon /> : <PlayIcon />}
             </button>
             <div className="flex-1">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <span className="label-caps text-white">{t('overview')}</span>
+                <span className="label-caps text-white">
+                  {speaking ? t('stopListening') : t('overview')}
+                </span>
                 <span className="flex items-center gap-1 rounded border border-hairline bg-surface-highest px-2 py-1 text-muted">
                   <VoiceIcon />
                   <span className="label-caps text-[10px]">{t('voice')}: Layla</span>
                 </span>
               </div>
               <div className="h-1 w-full overflow-hidden rounded-full bg-surface-highest">
-                <div className="h-full w-1/3 bg-accent" />
+                <div
+                  className={[
+                    'h-full bg-accent transition-all duration-500',
+                    speaking ? 'w-full animate-pulse' : 'w-0',
+                  ].join(' ')}
+                />
               </div>
             </div>
           </div>
@@ -219,6 +295,44 @@ export default function StoryPage() {
               <SourcedFact key={i} fact={fact} lang={lang} />
             ))}
           </div>
+
+          {/* The answer to a follow-up.
+
+              RULE 2 applies here as hard as anywhere: the prose is generated,
+              so it carries the source badge of every fact it was built from.
+              An answer the model could not ground is never shown as an answer
+              — the server returns covered: false and we say so plainly. */}
+          {(asking || answer) && (
+            <div ref={answerRef} className="mb-8 rounded-sheet border border-hairline bg-surface-high/40 p-4">
+              {asking && <p className="text-body text-muted">{t('thinking')}</p>}
+
+              {!asking && answer?.kind === 'covered' && (
+                <>
+                  <p className="mb-3 text-body text-white/90">{answer.text}</p>
+                  <p className="mb-2 label-caps text-muted">{t('answerFrom')}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {answer.fact_indexes.map((i) =>
+                      facts[i] ? (
+                        <SourceBadge
+                          key={i}
+                          name={facts[i].source_name}
+                          url={facts[i].source_url}
+                        />
+                      ) : null,
+                    )}
+                  </div>
+                </>
+              )}
+
+              {!asking && answer?.kind === 'uncovered' && (
+                <p className="text-body text-sand">{t('notInOurSources')}</p>
+              )}
+
+              {!asking && answer?.kind === 'failed' && (
+                <p className="text-body text-muted">{t('askFailed')}</p>
+              )}
+            </div>
+          )}
 
           {/* Nearby */}
           {nearby.length > 0 && (
@@ -242,22 +356,31 @@ export default function StoryPage() {
           )}
         </div>
 
-        {/* Follow-up input — inert. TODO(C): T-20, bounded by this entry only. */}
-        <div className="shrink-0 border-t border-hairline bg-surface p-gutter">
+        {/* Follow-up. Answered from THIS entry's facts or not at all (T-20). */}
+        <form onSubmit={submitQuestion} className="shrink-0 border-t border-hairline bg-surface p-gutter">
           <div className="relative">
             <input
               type="text"
-              disabled
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              disabled={asking}
+              maxLength={400}
               placeholder={t('askAboutPlace')}
               className="h-14 w-full rounded-ctl border border-hairline bg-surface-high pe-14 ps-4
-                         text-body text-white placeholder:text-muted/60"
+                         text-body text-white placeholder:text-muted/60 focus:border-accent
+                         focus:outline-none disabled:opacity-60"
             />
-            <span className="absolute end-2 top-2 flex h-10 w-10 items-center justify-center
-                             rounded-ctl bg-accent text-white opacity-70">
-              ↑
-            </span>
+            <button
+              type="submit"
+              disabled={asking || !question.trim()}
+              aria-label={t('askAboutPlace')}
+              className="absolute end-2 top-2 flex h-10 w-10 items-center justify-center
+                         rounded-ctl bg-accent text-white transition-opacity disabled:opacity-40"
+            >
+              <span aria-hidden="true" className="rtl:rotate-180">↑</span>
+            </button>
           </div>
-        </div>
+        </form>
       </section>
     </div>
   );

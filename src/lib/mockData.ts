@@ -110,9 +110,3 @@ export const MOCK_ELEMENT_LABELS: Record<string, string> = {
   minaret: 'Minaret',
 };
 
-/** Voice list for the settings sheet. Real list comes from SpeechSynthesis (T-19). */
-export const MOCK_VOICES = [
-  { id: 'layla', name: 'Layla', lang: 'AR' },
-  { id: 'omar', name: 'Omar', lang: 'AR' },
-  { id: 'sarah', name: 'Sarah', lang: 'EN' },
-] as const;

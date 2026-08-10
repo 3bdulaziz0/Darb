@@ -97,6 +97,13 @@ const en = {
   askAboutPlace: 'Ask about this place…',
   translationPending: 'Translation pending',
   back: 'Back',
+  listen: 'Listen',
+  stopListening: 'Stop',
+  thinking: 'Reading our sources…',
+  notInOurSources:
+    'Our sources do not cover that. I will not answer it from anywhere else.',
+  askFailed: 'That did not go through. Try again.',
+  answerFrom: 'Answered from',
 
   // Honest mode
   dontRecogniseTitle: 'I don’t recognise this building',
@@ -168,6 +175,12 @@ const ar: Record<keyof typeof en, string> = {
   askAboutPlace: 'اسأل عن هذا المكان…',
   translationPending: 'الترجمة قيد الإعداد',
   back: 'رجوع',
+  listen: 'استمع',
+  stopListening: 'إيقاف',
+  thinking: 'أقرأ مصادرنا…',
+  notInOurSources: 'مصادرنا لا تغطّي هذا السؤال، ولن أجيب عليه من مكان آخر.',
+  askFailed: 'لم تكتمل العملية. حاول مرة أخرى.',
+  answerFrom: 'الإجابة مأخوذة من',
 
   // Honest mode
   dontRecogniseTitle: 'لا أعرف هذا المبنى',

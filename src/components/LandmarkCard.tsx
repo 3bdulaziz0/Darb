@@ -74,6 +74,15 @@ export default function LandmarkCard({
       <div className="min-w-0 flex-1">
         <h3 className="truncate text-body-lg font-semibold text-white">{name}</h3>
         <p className="truncate text-caption text-muted">{secondary}</p>
+
+        {/* Says why this row is near the top: the camera can identify it. */}
+        {landmark.test_ready && (
+          <span className="mt-1 inline-flex h-6 items-center gap-1 rounded-full border
+                           border-accent/40 bg-accent/10 px-2 label-caps text-accent-soft">
+            <span aria-hidden="true" className="h-1.5 w-1.5 rounded-full bg-accent" />
+            {lang === 'ar' ? 'قابل للتعرّف' : 'Recognisable'}
+          </span>
+        )}
       </div>
 
       <div className="flex shrink-0 flex-col items-end gap-1">

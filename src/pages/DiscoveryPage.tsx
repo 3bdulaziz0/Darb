@@ -109,13 +109,24 @@ export default function DiscoveryPage() {
 
   // 'all' skips the radius filter but keeps the distance sort, so the nearest
   // is still first — you just are not cut off at a boundary.
-  const results = useMemo(
-    () =>
+  //
+  // Then the landmarks the camera can actually identify are pinned to the top.
+  // Those are the ones where the product does what it promises, so they should
+  // be what a visitor meets first; everything else stays in distance order
+  // beneath them. Each pinned row carries a badge, so the ordering is visible
+  // rather than mysterious.
+  const results = useMemo(() => {
+    const list =
       scope === 'all'
         ? withDistance(inCategory, origin.lat, origin.lng)
-        : nearby(inCategory, origin.lat, origin.lng, scope),
-    [inCategory, origin, scope],
-  );
+        : nearby(inCategory, origin.lat, origin.lng, scope);
+
+    return [...list].sort(
+      (a, b) =>
+        Number(Boolean(b.landmark.test_ready)) - Number(Boolean(a.landmark.test_ready)) ||
+        a.distance_km - b.distance_km,
+    );
+  }, [inCategory, origin, scope]);
 
   // Changing either filter starts the list again from the top.
   useEffect(() => {

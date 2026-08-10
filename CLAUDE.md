@@ -218,13 +218,35 @@ landmark in scope on that page and there must not be one.
 Confidence below the threshold is a refusal, not a hedged answer. Never soften
 this into "we think this might be…".
 
-### 4. `recognize.ts` is a stub until B replaces it
+### 4. The model is called from the server, never the browser
 
-It returns a mock `MatchResult` after 1 second. When the real implementation
-lands it must, in order: call the serverless endpoint (never Gemini from the
-browser), validate the response against the strict schema, **reject any
-`match_id` outside the submitted candidate list**, and map sub-threshold
-confidence to `match_id: null`.
+`src/lib/recognize.ts` posts to `/api/recognize`; the handler in `api/` holds
+the key and the grounding prompt. Both are out of reach of anyone using the
+app — a prompt the client could edit is a guarantee the client could remove.
+
+The key lives in `.env` with **no `VITE_` prefix**. Anything prefixed `VITE_`
+is compiled into the browser bundle in plain text. Check with:
+
+```bash
+npm run build && grep -r GEMINI dist/assets/
+```
+
+That must print nothing.
+
+Four rules hold on every recognition, enforced server-side and again on the
+client, because the cost of one confident wrong match is the whole product:
+
+1. Only ids the client submitted, resolved against the server's own copy of
+   the library, are ever candidates.
+2. The model sees names, visual markers and reference photographs — never
+   facts, categories or cities.
+3. Any `match_id` outside the submitted list is rejected after the answer.
+4. Confidence below the threshold becomes `match_id: null`.
+
+Follow-up answers are bounded the same way: `api/ask.ts` sends only that
+landmark's facts and requires the model to return which ones it used. An
+answer citing nothing is returned as not-covered, because unsourced prose is
+the thing this product exists to refuse.
 
 ---
 

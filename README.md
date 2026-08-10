@@ -16,6 +16,24 @@ That separation is the product. See [CLAUDE.md](CLAUDE.md) before writing code.
 npm install
 ```
 
+Then create your `.env`:
+
+```bash
+cp .env.example .env
+```
+
+Put your Gemini key in it. **The variable has no `VITE_` prefix, and that is
+deliberate** — Vite inlines every `VITE_` variable into the JavaScript it ships
+to the browser, so a key with that prefix is published, not secret. Without the
+prefix it is only visible to the serverless functions in `api/`, which is the
+only place the model is ever called from.
+
+Get a key at https://aistudio.google.com/apikey. On the hosting platform, set
+`GEMINI_API_KEY` in the project's environment variables — never in the repo.
+
+No key? The app still runs. Recognition returns a clear error, and you can set
+`VITE_RAWI_USE_STUB=1` in `.env` to use the offline stub instead.
+
 ```bash
 npm run dev
 ```
@@ -30,6 +48,23 @@ camera, no GPS needed.
 | `/not-found` | Honest mode — "I don't recognise this building" |
 | `/discover` | Radius discovery (1 / 5 / 20 km) |
 | `/settings` | Language, voice, reading speed |
+
+## The model
+
+Two serverless functions, both in `api/`, both reading the key server-side:
+
+| Endpoint | Does |
+|---|---|
+| `POST /api/recognize` | Identifies the photo against a candidate list, or refuses |
+| `POST /api/ask` | Answers a follow-up strictly from that landmark's stored facts |
+
+`npm run dev` serves them too, through a small plugin in `vite.config.ts`, so
+the app behaves the same locally as deployed.
+
+Recognition can only ever return one of the ids the client submitted, and only
+those flagged `test_ready` are ever submitted. Anything else, including a
+sub-threshold confidence, becomes `match_id: null` and routes to the refusal
+screen. Both rules are enforced on the server and again on the client.
 
 To demo the refusal path, tap the dashed **DEV · FORCE NO MATCH** chip on the
 camera screen, then tap the shutter. It forces the stub to return

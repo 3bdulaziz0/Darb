@@ -17,10 +17,10 @@
  * storage, by scope.
  */
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLang } from '../lib/i18n';
-import { MOCK_VOICES } from '../lib/mockData';
+import { listVoices, onVoicesChanged, speak, type Voice } from '../lib/speech';
 
 function PlayIcon() {
   return (
@@ -45,8 +45,18 @@ export default function SettingsPage() {
   // Language is real app state now — changing it here flips the whole
   // interface and the document direction immediately.
   const { lang, setLang, t } = useLang();
-  const [voiceId, setVoiceId] = useState<string>(MOCK_VOICES[0].id);
   const [speed, setSpeed] = useState(1);
+
+  // Real voices installed on this device. The list arrives asynchronously in
+  // most browsers, so we subscribe rather than reading once.
+  const [voices, setVoices] = useState<Voice[]>(() => listVoices(lang));
+  const [voiceId, setVoiceId] = useState<string>('');
+
+  useEffect(() => {
+    const refresh = () => setVoices(listVoices(lang));
+    refresh();
+    return onVoicesChanged(refresh);
+  }, [lang]);
 
   return (
     <div className="flex h-full flex-col justify-end">
@@ -91,14 +101,31 @@ export default function SettingsPage() {
 
           {/* Voice */}
           <h2 className="mb-4 text-body-lg text-muted">{t('narrationVoice')}</h2>
+          {voices.length === 0 && (
+            <p className="mb-8 text-body text-muted">
+              {lang === 'ar'
+                ? 'لا توجد أصوات عربية مثبّتة على هذا الجهاز. سيُستخدم الصوت الافتراضي.'
+                : 'No voices for this language are installed on this device. The system default will be used.'}
+            </p>
+          )}
+
           <ul className="mb-8 flex flex-col gap-3">
-            {MOCK_VOICES.map((voice) => {
+            {voices.map((voice) => {
               const selected = voice.id === voiceId;
               return (
                 <li key={voice.id}>
                   <button
                     type="button"
-                    onClick={() => setVoiceId(voice.id)}
+                    onClick={() => {
+                      setVoiceId(voice.id);
+                      // Preview it, so choosing a voice means hearing it.
+                      speak({
+                        text: lang === 'ar' ? 'مرحبًا، سأروي لك القصة.' : 'Hello, I will read the story.',
+                        lang,
+                        voiceId: voice.id,
+                        rate: speed,
+                      });
+                    }}
                     aria-pressed={selected}
                     className={[
                       'flex w-full items-center gap-4 rounded-ctl border p-3 text-start transition-colors',
@@ -117,7 +144,7 @@ export default function SettingsPage() {
                       {voice.name}
                     </span>
                     <span className="rounded bg-surface-highest px-2 py-1 label-caps text-muted">
-                      {voice.lang}
+                      {voice.lang.toUpperCase()}
                     </span>
                     {selected && <span className="ms-auto text-accent-soft"><CheckIcon /></span>}
                   </button>
