@@ -270,6 +270,31 @@ describe('sealFacts', () => {
     expect(fact.text_en.source_url).toBe('https://example.org/a');
   });
 
+  it('points the Arabic text at the Arabic source when the publisher has one', () => {
+    const bilingual = makeLandmark({
+      facts: [
+        {
+          text_ar: 'نص',
+          text_en: 'text',
+          source_name: 'Visit Saudi',
+          source_url: 'https://www.visitsaudi.com/en/x',
+          source_url_ar: 'https://www.visitsaudi.com/ar/x',
+        },
+      ],
+    });
+    const [fact] = sealFacts(bilingual);
+    expect(fact.text_ar.source_url).toBe('https://www.visitsaudi.com/ar/x');
+    expect(fact.text_en.source_url).toBe('https://www.visitsaudi.com/en/x');
+  });
+
+  it('falls back to the one source when the publisher has no Arabic page', () => {
+    // Wikipedia is not mirrored — ar.wikipedia is a different encyclopedia,
+    // not a translation, so both languages cite the page we actually read.
+    const [fact] = sealFacts(makeLandmark());
+    expect(fact.text_ar.source_url).toBe('https://example.org/a');
+    expect(fact.text_en.source_url).toBe('https://example.org/a');
+  });
+
   it('drops a fact that has no source instead of rendering it bare', () => {
     const unsourced = makeLandmark({
       facts: [{ text_ar: 'نص', text_en: 'text', source_name: '', source_url: '' }],

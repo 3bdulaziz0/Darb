@@ -21,6 +21,7 @@
  */
 
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { useLang } from '../lib/i18n';
 import { MOCK_ELEMENT_LABELS, MOCK_NO_MATCH } from '../lib/mockData';
 
 interface HonestModeState {
@@ -40,6 +41,7 @@ function ChevronIcon() {
 
 export default function NotFoundLandmarkPage() {
   const navigate = useNavigate();
+  const { t } = useLang();
   const state = (useLocation().state ?? {}) as HonestModeState;
 
   // Opened directly (no capture)? Fall back to the mock miss so the page
@@ -61,14 +63,12 @@ export default function NotFoundLandmarkPage() {
         </div>
 
         <div className="scroll-area flex-1 px-gutter">
-          <h1 className="mb-3 text-display text-white">I don&rsquo;t recognise this building</h1>
-          <p className="mb-6 text-body-lg text-muted">
-            It&rsquo;s not in our verified library, so I won&rsquo;t guess its story.
-          </p>
+          <h1 className="mb-3 text-display text-white">{t('dontRecogniseTitle')}</h1>
+          <p className="mb-6 text-body-lg text-muted">{t('dontRecogniseBody')}</p>
 
           <hr className="mb-6 border-hairline" />
 
-          <h2 className="mb-3 label-caps text-muted">But here&rsquo;s what I can see</h2>
+          <h2 className="mb-3 label-caps text-muted">{t('butICanSee')}</h2>
 
           <ul className="flex flex-col gap-3 pb-6">
             {elements.map((key) => (
@@ -89,7 +89,7 @@ export default function NotFoundLandmarkPage() {
                   </span>
                   {/* TODO(C): T-16 — open the curated glossary entry. */}
                   <span className="flex items-center gap-1 label-caps text-accent-soft">
-                    Explain
+                    {t('explain')}
                     <ChevronIcon />
                   </span>
                 </button>
@@ -105,7 +105,7 @@ export default function NotFoundLandmarkPage() {
             className="flex h-14 items-center justify-center rounded-full bg-accent
                        text-body-lg font-semibold text-white"
           >
-            Browse nearby landmarks
+            {t('browseNearby')}
           </Link>
           <button
             type="button"
@@ -113,7 +113,7 @@ export default function NotFoundLandmarkPage() {
             className="flex h-14 w-full items-center justify-center rounded-full border
                        border-accent/60 text-body-lg text-accent-soft"
           >
-            Retake photo
+            {t('retakePhoto')}
           </button>
         </div>
       </section>

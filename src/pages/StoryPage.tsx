@@ -26,7 +26,8 @@ import { SourcedFact } from '../components/SourceBadge';
 import { PHOTO_PENDING } from '../components/LandmarkCard';
 import { categoryColor, categoryLabel } from '../lib/categories';
 import { getLandmark, loadLandmarks, sealFacts, withDistance } from '../lib/library';
-import { MOCK_ELEMENT_LABELS, MOCK_LANG } from '../lib/mockData';
+import { useLang } from '../lib/i18n';
+import { MOCK_ELEMENT_LABELS } from '../lib/mockData';
 import type { Landmark, SealedFact } from '../lib/types';
 
 function BackIcon() {
@@ -57,7 +58,7 @@ function VoiceIcon() {
 
 export default function StoryPage() {
   const { id } = useParams<{ id: string }>();
-  const lang = MOCK_LANG;
+  const { lang, t } = useLang();
 
   // The frame the visitor just captured, when they arrived from the camera.
   // Opened from the discovery list there is none, and we show the library
@@ -109,16 +110,16 @@ export default function StoryPage() {
   if (missing) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-6 px-gutter text-center">
-        <p className="text-headline text-white">That landmark is not in our library.</p>
+        <p className="text-headline text-white">{t('notInLibrary')}</p>
         <Link to="/" className="flex h-touch items-center rounded-ctl bg-accent px-6 text-body font-semibold">
-          Back to camera
+          {t('backToCamera')}
         </Link>
       </div>
     );
   }
 
   if (!landmark) {
-    return <div className="flex h-full items-center justify-center text-muted">Loading…</div>;
+    return <div className="flex h-full items-center justify-center text-muted">{t('loading')}</div>;
   }
 
   // Falls back to the language we have — most of the library is English-only
@@ -142,7 +143,7 @@ export default function StoryPage() {
       </div>
 
       <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between p-gutter">
-        <Link to="/" aria-label="Back" className="control glass text-white">
+        <Link to="/" aria-label={t('back')} className="control glass text-white">
           <BackIcon />
         </Link>
       </div>
@@ -200,10 +201,10 @@ export default function StoryPage() {
             </button>
             <div className="flex-1">
               <div className="mb-2 flex items-center justify-between gap-2">
-                <span className="label-caps text-white">Overview</span>
+                <span className="label-caps text-white">{t('overview')}</span>
                 <span className="flex items-center gap-1 rounded border border-hairline bg-surface-highest px-2 py-1 text-muted">
                   <VoiceIcon />
-                  <span className="label-caps text-[10px]">Voice: Layla</span>
+                  <span className="label-caps text-[10px]">{t('voice')}: Layla</span>
                 </span>
               </div>
               <div className="h-1 w-full overflow-hidden rounded-full bg-surface-highest">
@@ -222,7 +223,7 @@ export default function StoryPage() {
           {/* Nearby */}
           {nearby.length > 0 && (
             <section className="mb-8">
-              <h2 className="mb-3 text-headline text-white">Nearby</h2>
+              <h2 className="mb-3 text-headline text-white">{t('nearby')}</h2>
               <div className="scroll-area -mx-gutter flex gap-4 overflow-x-auto px-gutter pb-2">
                 {nearby.map((l) => (
                   <Link key={l.id} to={`/story/${l.id}`} className="w-[140px] shrink-0">
@@ -232,7 +233,7 @@ export default function StoryPage() {
                       className="mb-2 aspect-square w-full rounded-ctl object-cover"
                     />
                     <p className="truncate text-body font-semibold text-white">
-                      {lang === 'ar' ? l.name_ar : l.name_en}
+                      {(lang === 'ar' ? l.name_ar : l.name_en) || l.name_en}
                     </p>
                   </Link>
                 ))}
@@ -247,7 +248,7 @@ export default function StoryPage() {
             <input
               type="text"
               disabled
-              placeholder="Ask about this place…"
+              placeholder={t('askAboutPlace')}
               className="h-14 w-full rounded-ctl border border-hairline bg-surface-high pe-14 ps-4
                          text-body text-white placeholder:text-muted/60"
             />

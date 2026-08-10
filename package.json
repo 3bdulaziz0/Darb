@@ -8,6 +8,7 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "photos": "node scripts/photos.mjs",
+    "sources:ar": "node scripts/arabic-sources.mjs",
     "test": "vitest run",
     "test:watch": "vitest",
     "typecheck": "tsc -b --noEmit"

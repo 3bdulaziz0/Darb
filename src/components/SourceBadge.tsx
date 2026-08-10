@@ -10,6 +10,7 @@
  * shrink this into fine print.
  */
 
+import { STRINGS } from '../lib/i18n';
 import type { Lang, SealedFact } from '../lib/types';
 
 function LinkIcon() {
@@ -85,7 +86,7 @@ export function SourcedFact({ fact, lang }: { fact: SealedFact; lang: Lang }) {
         {pending && (
           <span className="flex min-h-[32px] items-center rounded-full border border-sand/30
                            bg-sand/10 px-3 label-caps text-sand">
-            {lang === 'ar' ? 'الترجمة قيد الإعداد' : 'Translation pending'}
+            {STRINGS[lang].translationPending}
           </span>
         )}
       </div>

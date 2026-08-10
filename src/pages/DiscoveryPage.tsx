@@ -26,7 +26,8 @@ import {
   nearestCoveredArea,
   withDistance,
 } from '../lib/library';
-import { MOCK_LANG, MOCK_ORIGIN } from '../lib/mockData';
+import { useLang } from '../lib/i18n';
+import { MOCK_ORIGIN } from '../lib/mockData';
 import type { Category, DiscoveryScope, Landmark } from '../lib/types';
 
 const SCOPES: DiscoveryScope[] = [1, 5, 20, 'all'];
@@ -65,15 +66,16 @@ function GearIcon() {
 }
 
 function BottomNav() {
+  const { t } = useLang();
   return (
     <nav className="flex shrink-0 items-center justify-around border-t border-hairline bg-surface px-gutter py-3">
       <span aria-current="page" className="control bg-accent text-white">
         <CompassIcon />
       </span>
-      <Link to="/" aria-label="Camera" className="control border border-hairline text-muted">
+      <Link to="/" aria-label={t('camera')} className="control border border-hairline text-muted">
         <ShutterIcon />
       </Link>
-      <Link to="/settings" aria-label="Settings" className="control border border-hairline text-muted">
+      <Link to="/settings" aria-label={t('settings')} className="control border border-hairline text-muted">
         <GearIcon />
       </Link>
     </nav>
@@ -82,7 +84,7 @@ function BottomNav() {
 
 export default function DiscoveryPage() {
   const navigate = useNavigate();
-  const lang = MOCK_LANG;
+  const { lang, t } = useLang();
 
   const [library, setLibrary] = useState<Landmark[]>([]);
   const [scope, setScope] = useState<DiscoveryScope>(5);
@@ -134,8 +136,34 @@ export default function DiscoveryPage() {
   );
 
   const label = category === 'all' ? null : categoryLabel(category, lang);
-  /** "3 heritage landmarks" / "3 landmarks" */
-  const noun = (n: number) => `${n} ${label ? `${label.toLowerCase()} ` : ''}landmark${n === 1 ? '' : 's'}`;
+
+  /**
+   * "3 heritage landmarks" · "٣ معالم · تراثي"
+   *
+   * Arabic counts do not pluralise the way English does — 1 takes the
+   * singular, 2 a dual, 3–10 a plural, and 11+ the singular again in the
+   * accusative. The category is appended as a separate qualifier rather than
+   * an adjective, which sidesteps gender agreement entirely and still reads
+   * naturally.
+   */
+  const noun = (n: number) => {
+    if (lang === 'en') {
+      return `${n} ${label ? `${label.toLowerCase()} ` : ''}landmark${n === 1 ? '' : 's'}`;
+    }
+    const word =
+      n === 1 ? 'معلم واحد' : n === 2 ? 'معلمان' : n <= 10 ? `${n} معالم` : `${n} معلمًا`;
+    return label ? `${word} · ${label}` : word;
+  };
+
+  /** "4 landmarks within 5 km" · "٤ معالم ضمن ٥ كم" */
+  const summary = (n: number) => {
+    if (scope === 'all') {
+      return lang === 'ar'
+        ? `${noun(n)} في ${cityCount} ${cityCount === 1 ? 'مدينة' : 'مدن'}`
+        : `${noun(n)} across ${cityCount} ${cityCount === 1 ? 'city' : 'cities'}`;
+    }
+    return lang === 'ar' ? `${noun(n)} ضمن ${scope} كم` : `${noun(n)} within ${scope} km`;
+  };
 
   return (
     <div className="flex h-full flex-col">
@@ -145,7 +173,7 @@ export default function DiscoveryPage() {
         <div className="absolute inset-0 bg-gradient-to-b from-transparent to-bg" />
         <span className="absolute bottom-3 start-gutter label-caps text-muted">
           {/* TODO(C): T-32 — real map with pins. */}
-          Map placeholder
+          {t('mapPlaceholder')}
         </span>
       </div>
 
@@ -153,7 +181,7 @@ export default function DiscoveryPage() {
         {/* Radius selector */}
         <div
           role="group"
-          aria-label="Search radius"
+          aria-label={t('searchRadius')}
           className="mb-4 inline-flex rounded-full border border-hairline bg-surface p-1"
         >
           {SCOPES.map((s) => (
@@ -167,7 +195,7 @@ export default function DiscoveryPage() {
                 scope === s ? 'bg-accent font-semibold text-white' : 'text-muted',
               ].join(' ')}
             >
-              {s === 'all' ? 'All' : `${s} KM`}
+              {s === 'all' ? t('all') : `${s} ${lang === 'ar' ? 'كم' : 'KM'}`}
             </button>
           ))}
         </div>
@@ -175,7 +203,7 @@ export default function DiscoveryPage() {
         {/* Category filter — works together with the radius above. */}
         <div
           role="group"
-          aria-label="Filter by category"
+          aria-label={t('filterByCategory')}
           className="scroll-area -mx-gutter mb-4 flex gap-2 overflow-x-auto px-gutter pb-1"
         >
           <button
@@ -189,7 +217,7 @@ export default function DiscoveryPage() {
                 : 'border-hairline bg-surface text-muted',
             ].join(' ')}
           >
-            All
+            {t('all')}
           </button>
 
           {CATEGORIES.map((key) => {
@@ -217,9 +245,7 @@ export default function DiscoveryPage() {
         {results.length > 0 ? (
           <>
             <p className="mb-4 text-body text-muted">
-              {scope === 'all'
-                ? `${noun(results.length)} across ${cityCount} ${cityCount === 1 ? 'city' : 'cities'}`
-                : `${noun(results.length)} within ${scope} km`}
+              {summary(results.length)}
             </p>
 
             <ul className="flex flex-col gap-3">
@@ -240,9 +266,9 @@ export default function DiscoveryPage() {
                 className="mt-4 flex h-14 w-full items-center justify-center rounded-ctl
                            border border-hairline bg-surface text-body text-accent-soft"
               >
-                Show {Math.min(PAGE_SIZE, results.length - shown)} more
+                {t('showMore')}
                 <span className="ms-2 text-muted">
-                  ({shown} of {results.length})
+                  ({shown} / {results.length})
                 </span>
               </button>
             )}
@@ -254,8 +280,13 @@ export default function DiscoveryPage() {
           //    point at the nearest covered area. Never pad the list.
           <div className="rounded-sheet border border-hairline bg-surface p-6 text-center">
             <h2 className="mb-2 text-headline text-white">
-              No verified {label ? `${label.toLowerCase()} ` : ''}landmarks
-              {scope === 'all' ? ' in the library' : ` within ${scope} km`}
+              {lang === 'ar'
+                ? `لا توجد معالم موثّقة${label ? ` من تصنيف ${label}` : ''} ${
+                    scope === 'all' ? t('noneInLibrary') : `ضمن ${scope} كم`
+                  }`
+                : `No verified ${label ? `${label.toLowerCase()} ` : ''}landmarks ${
+                    scope === 'all' ? t('noneInLibrary') : `within ${scope} km`
+                  }`}
             </h2>
 
             {/* Say which filter came up empty. "Nothing within 5 km" and
@@ -263,10 +294,16 @@ export default function DiscoveryPage() {
                 telling the visitor the wrong one sends them walking. */}
             <p className="mb-6 text-body text-muted">
               {inCategory.length === 0
-                ? `Our library doesn't cover any ${label?.toLowerCase()} landmarks yet.`
-                : `Our library covers ${noun(inCategory.length)} across ${cityCount} ${
-                    cityCount === 1 ? 'city' : 'cities'
-                  }.`}
+                ? lang === 'ar'
+                  ? `مكتبتنا لا تغطي أي معالم من تصنيف ${label} حتى الآن.`
+                  : `Our library doesn't cover any ${label?.toLowerCase()} landmarks yet.`
+                : lang === 'ar'
+                  ? `مكتبتنا تغطي ${noun(inCategory.length)} في ${cityCount} ${
+                      cityCount === 1 ? 'مدينة' : 'مدن'
+                    }.`
+                  : `Our library covers ${noun(inCategory.length)} across ${cityCount} ${
+                      cityCount === 1 ? 'city' : 'cities'
+                    }.`}
             </p>
 
             {nearest && (
@@ -282,7 +319,7 @@ export default function DiscoveryPage() {
                   </span>
                   <span className="label-caps text-sand">
                     {nearest.landmark.city ? `${nearest.landmark.city} · ` : ''}
-                    {formatDistance(nearest.distance_km)}
+                    {formatDistance(nearest.distance_km, lang)}
                   </span>
                 </span>
                 <span aria-hidden="true" className="text-muted">→</span>
@@ -298,7 +335,7 @@ export default function DiscoveryPage() {
                 className="mb-3 flex h-14 w-full items-center justify-center rounded-ctl bg-accent
                            text-body-lg font-semibold text-white"
               >
-                Show all categories
+                {t('showAllCategories')}
               </button>
             )}
 
@@ -315,7 +352,7 @@ export default function DiscoveryPage() {
                     : 'border border-accent/60 text-accent-soft',
                 ].join(' ')}
               >
-                Show every landmark
+                {t('showEveryLandmark')}
               </button>
             )}
           </div>

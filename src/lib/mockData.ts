@@ -11,10 +11,7 @@
  * live in public/landmarks.json and are curated by teammate D (T-2).
  */
 
-import type { Coordinates, Landmark, Lang, MatchResult } from './types';
-
-/** Active language. Teammate C replaces this with real i18n state (T-18). */
-export const MOCK_LANG: Lang = 'en';
+import type { Coordinates, Landmark, MatchResult } from './types';
 
 /**
  * Stand-in for the user's GPS fix, used by the screens that do not read real

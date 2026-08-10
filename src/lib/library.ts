@@ -27,12 +27,14 @@
 import type {
   Coordinates,
   Fact,
+  Lang,
   Landmark,
   LandmarkWithDistance,
   SealedFact,
   SourcedText,
 } from './types';
 import { CATEGORIES, isCategory } from './categories';
+import { distanceUnit } from './i18n';
 
 // ── Loading ─────────────────────────────────────────────────────────────────
 
@@ -142,6 +144,9 @@ export function parseLandmarks(data: unknown): Landmark[] {
       // are willing to hold, let alone render.
       requireString(fact.source_name, `${at}.source_name`);
       requireString(fact.source_url, `${at}.source_url`);
+      if (fact.source_url_ar !== undefined) {
+        requireString(fact.source_url_ar, `${at}.source_url_ar`);
+      }
     });
   });
 
@@ -301,12 +306,13 @@ export function selectCandidates(
 
 // ── Rule 2: sealing ─────────────────────────────────────────────────────────
 
-function seal(text: string, fact: Fact): SourcedText {
+function seal(text: string, fact: Fact, lang: Lang): SourcedText {
   return {
     __sourced: 'fact',
     text,
     source_name: fact.source_name,
-    source_url: fact.source_url,
+    // An Arabic reader gets the publisher's Arabic page when there is one.
+    source_url: (lang === 'ar' && fact.source_url_ar) || fact.source_url,
   };
 }
 
@@ -321,8 +327,8 @@ export function sealFacts(landmark: Landmark): SealedFact[] {
   return landmark.facts
     .filter((f) => Boolean(f.source_url) && Boolean(f.source_name))
     .map((f) => ({
-      text_ar: seal(f.text_ar, f),
-      text_en: seal(f.text_en, f),
+      text_ar: seal(f.text_ar, f, 'ar'),
+      text_en: seal(f.text_en, f, 'en'),
       source_name: f.source_name,
       source_url: f.source_url,
     }));
@@ -330,7 +336,11 @@ export function sealFacts(landmark: Landmark): SealedFact[] {
 
 // ── Formatting ──────────────────────────────────────────────────────────────
 
-/** Turns 0.42 into "420 M" and 2.37 into "2.4 KM", for display. */
-export function formatDistance(km: number): string {
-  return km < 1 ? `${Math.round(km * 1000)} M` : `${km.toFixed(1)} KM`;
+/**
+ * Turns 0.42 into "420 M" and 2.37 into "2.4 KM", for display.
+ * Pass 'ar' for the Arabic units — "420 م" / "2.4 كم".
+ */
+export function formatDistance(km: number, lang: Lang = 'en'): string {
+  const value = km < 1 ? Math.round(km * 1000) : Number(km.toFixed(1));
+  return `${value} ${distanceUnit(km, lang)}`;
 }

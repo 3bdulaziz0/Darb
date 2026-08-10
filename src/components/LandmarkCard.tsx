@@ -78,7 +78,7 @@ export default function LandmarkCard({
 
       <div className="flex shrink-0 flex-col items-end gap-1">
         {distanceKm !== undefined && (
-          <span className="label-caps text-sand">{formatDistance(distanceKm)}</span>
+          <span className="label-caps text-sand">{formatDistance(distanceKm, lang)}</span>
         )}
         <span
           className="control h-touch w-touch border border-hairline bg-surface-high text-muted"

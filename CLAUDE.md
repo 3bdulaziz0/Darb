@@ -39,6 +39,7 @@ works if nobody reaches across the line.
 | `src/lib/library.ts` | **D** | Loader, distance, radius filtering |
 | `src/lib/types.ts` | **frozen** | Shared types. Changing one changes everyone's work |
 | `src/lib/categories.ts` | **shared** | Category labels (ar/en) + map pin colours |
+| `src/lib/i18n.ts` | **C** | Every interface string, both languages |
 | `src/components/SourceBadge.tsx` | **shared** | Rule 2 lives here — review any change |
 | `src/lib/mockData.ts` | **shared** | Dev scaffolding. Delete before the demo |
 
@@ -73,10 +74,11 @@ Category =
   | 'museum'   | 'market'    | 'natural' | 'modern'
 
 Fact {
-  text_ar: string
-  text_en: string
+  text_ar: string          // either side may be empty while untranslated
+  text_en: string          // but never both
   source_name: string
   source_url: string
+  source_url_ar?: string   // publisher's own Arabic page, set by a script
 }
 
 MatchResult {
@@ -114,6 +116,19 @@ files in and run `npm run photos`; the script writes `reference_images` into
 See `public/landmarks/README.md` — it is written for a curator, not a
 developer.
 
+### Language
+
+`src/lib/i18n.ts` holds every interface string in both languages, and nothing
+else. It must never hold a landmark name, a date, or a description — those are
+library data with sources attached.
+
+Arabic is the default. Switching language sets `dir` on `<html>` and nothing
+more; the layout mirrors on its own because every screen uses logical
+properties. If a screen looks wrong in Arabic, something used `pl-`/`left-`.
+
+Adding a string means adding it to **both** objects — `ar` is typed as
+`Record<keyof typeof en, string>`, so forgetting one is a compile error.
+
 ### Translation pending
 
 `name_ar` and one side of a `Fact` may be an empty string while a translation
@@ -121,6 +136,13 @@ is pending. A fact must still carry text in **at least one** language, and
 always its source. `<SourcedFact/>` renders the language we have and labels it
 "translation pending" — it never machine-translates the missing one into
 existence, and never renders a blank where a fact should be.
+
+**We do not translate facts. Ever.** Not by hand, not with a model. A fact in
+Arabic must be written from an Arabic source by a human. `npm run sources:ar`
+fills in `source_url_ar` so an Arabic reader reaches the publisher's own
+Arabic page — it rewrites links, never text. The badge follows the text: if
+you are reading the English fact because Arabic is pending, it cites the
+English page, because that is the page we are actually quoting.
 
 `category` is a fixed union, so a typo fails to compile in our own code — and
 because `landmarks.json` is data the compiler never sees, `loadLandmarks()`

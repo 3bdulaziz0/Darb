@@ -34,6 +34,14 @@ export interface Fact {
   text_en: string;
   source_name: string;
   source_url: string;
+  /**
+   * The same reference on the source's own Arabic page, when it publishes one.
+   *
+   * An Arabic reader tapping a source badge should land on Arabic, not on the
+   * English page. This is a link to the publisher's translation — we never
+   * copy their text in, and we never translate it ourselves.
+   */
+  source_url_ar?: string;
 }
 
 /**

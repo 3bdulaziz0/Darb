@@ -21,6 +21,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StatusIndicator from '../components/StatusIndicator';
+import { useLang } from '../lib/i18n';
 import { isRecognisable, loadLandmarks, selectCandidates } from '../lib/library';
 import { getPosition } from '../lib/location';
 import { recognize } from '../lib/recognize';
@@ -137,14 +138,15 @@ function GearIcon() {
 
 /** Location status pill. Never blocks anything — it only reports. */
 function LocationPill({ status }: { status: LocationStatus }) {
+  const { t } = useLang();
   const text =
     status.state === 'acquiring'
-      ? 'Locating…'
+      ? t('locating')
       : status.state === 'acquired'
         ? `±${Math.round(status.accuracy)} m`
         : status.state === 'denied'
-          ? 'Location off'
-          : 'No fix';
+          ? t('locationOff')
+          : t('noFix');
 
   const tone =
     status.state === 'acquired'
@@ -220,25 +222,17 @@ function CameraFallback({
   status: CameraStatus;
   onFile: (file: File) => void;
 }) {
+  const { t } = useLang();
   const message =
     status.state === 'denied'
-      ? {
-          title: 'Camera access is blocked',
-          body: 'Allow camera access for this site in your browser settings, then reload. You can also pick a photo instead.',
-        }
+      ? { title: t('cameraBlockedTitle'), body: t('cameraBlockedBody') }
       : status.state === 'none'
-        ? {
-            title: 'No camera found',
-            body: 'This device has no camera we can use. Pick a photo instead.',
-          }
+        ? { title: t('cameraNoneTitle'), body: t('cameraNoneBody') }
         : status.state === 'insecure'
-          ? {
-              title: 'This page is not secure',
-              body: 'Cameras only work over HTTPS. Open the preview URL rather than the local network address. You can still pick a photo.',
-            }
+          ? { title: t('cameraInsecureTitle'), body: t('cameraInsecureBody') }
           : {
-              title: 'The camera could not start',
-              body: status.state === 'error' ? status.detail : 'Something went wrong.',
+              title: t('cameraErrorTitle'),
+              body: status.state === 'error' ? status.detail : t('cameraErrorBody'),
             };
 
   return (
@@ -250,7 +244,7 @@ function CameraFallback({
         className="flex h-14 w-full max-w-xs cursor-pointer items-center justify-center rounded-ctl
                    bg-accent text-body-lg font-semibold text-white"
       >
-        Choose a photo
+        {t('choosePhoto')}
         <input
           type="file"
           accept="image/*"
@@ -271,6 +265,7 @@ function CameraFallback({
 
 export default function CameraPage() {
   const navigate = useNavigate();
+  const { lang, setLang, t } = useLang();
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
@@ -479,9 +474,13 @@ export default function CameraPage() {
       {/* Top bar */}
       <div className="absolute inset-x-0 top-0 z-10 flex items-center justify-between p-gutter">
         <LocationPill status={location} />
-        {/* TODO(C): this is the language toggle (T-18). Inert for now. */}
-        <button type="button" className="control glass text-white label-caps">
-          EN
+        <button
+          type="button"
+          onClick={() => setLang(lang === 'ar' ? 'en' : 'ar')}
+          aria-label={t('language')}
+          className="control glass text-white label-caps"
+        >
+          {lang === 'ar' ? 'EN' : 'ع'}
         </button>
       </div>
 
@@ -494,7 +493,7 @@ export default function CameraPage() {
         <>
           <p className="absolute inset-x-0 bottom-40 z-10 mx-auto w-fit rounded-ctl bg-black/40 px-5 py-3
                         text-body-lg text-white backdrop-blur-glass">
-            Point at a landmark
+            {t('pointAtLandmark')}
           </p>
 
           {/* Bottom controls */}
@@ -502,7 +501,7 @@ export default function CameraPage() {
             <button
               type="button"
               onClick={() => navigate('/discover')}
-              aria-label="Discover landmarks nearby"
+              aria-label={t('discoverNearby')}
               className="control glass text-white"
             >
               <MapIcon />
@@ -512,7 +511,7 @@ export default function CameraPage() {
               type="button"
               onClick={handleCapture}
               disabled={camera.state !== 'live' || stage !== null}
-              aria-label="Capture"
+              aria-label={t('capture')}
               className="flex h-[76px] w-[76px] items-center justify-center rounded-full border-4
                          border-white/90 transition-transform active:scale-95 disabled:opacity-60"
             >
@@ -522,7 +521,7 @@ export default function CameraPage() {
             <button
               type="button"
               onClick={() => navigate('/settings')}
-              aria-label="Settings"
+              aria-label={t('settings')}
               className="control glass text-white"
             >
               <GearIcon />
@@ -536,7 +535,7 @@ export default function CameraPage() {
         <div className="absolute inset-0 z-30">
           <img src={frozenFrame} alt="" className="h-full w-full object-cover" />
           <div className="absolute inset-0 bg-bg/80 backdrop-blur-glass" />
-          <StatusIndicator stage={stage} onCancel={handleCancel} />
+          <StatusIndicator stage={stage} onCancel={handleCancel} lang={lang} />
         </div>
       )}
     </div>

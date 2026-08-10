@@ -19,8 +19,8 @@
 
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { MOCK_LANG, MOCK_VOICES } from '../lib/mockData';
-import type { Lang } from '../lib/types';
+import { useLang } from '../lib/i18n';
+import { MOCK_VOICES } from '../lib/mockData';
 
 function PlayIcon() {
   return (
@@ -42,8 +42,9 @@ function CheckIcon() {
 export default function SettingsPage() {
   const navigate = useNavigate();
 
-  // Local-only for now. TODO(C): lift to real app state (T-18).
-  const [lang, setLang] = useState<Lang>(MOCK_LANG);
+  // Language is real app state now — changing it here flips the whole
+  // interface and the document direction immediately.
+  const { lang, setLang, t } = useLang();
   const [voiceId, setVoiceId] = useState<string>(MOCK_VOICES[0].id);
   const [speed, setSpeed] = useState(1);
 
@@ -52,7 +53,7 @@ export default function SettingsPage() {
       {/* Scrim — tapping it closes the sheet. */}
       <button
         type="button"
-        aria-label="Close settings"
+        aria-label={t('settings')}
         onClick={() => navigate(-1)}
         className="flex-1 bg-black/40"
       />
@@ -63,11 +64,11 @@ export default function SettingsPage() {
         </div>
 
         <div className="px-gutter">
-          <h1 className="mb-8 text-display text-white">Settings</h1>
+          <h1 className="mb-8 text-display text-white">{t('settings')}</h1>
 
           {/* Language */}
           <div className="mb-6 flex items-center justify-between gap-4">
-            <span className="text-body-lg text-white">Language</span>
+            <span className="text-body-lg text-white">{t('language')}</span>
             <div className="inline-flex rounded-full border border-hairline bg-surface-high p-1">
               {(['ar', 'en'] as const).map((code) => (
                 <button
@@ -89,7 +90,7 @@ export default function SettingsPage() {
           <hr className="mb-6 border-hairline" />
 
           {/* Voice */}
-          <h2 className="mb-4 text-body-lg text-muted">Narration voice</h2>
+          <h2 className="mb-4 text-body-lg text-muted">{t('narrationVoice')}</h2>
           <ul className="mb-8 flex flex-col gap-3">
             {MOCK_VOICES.map((voice) => {
               const selected = voice.id === voiceId;
@@ -126,7 +127,7 @@ export default function SettingsPage() {
           </ul>
 
           {/* Reading speed */}
-          <h2 className="mb-4 text-body-lg text-muted">Reading speed</h2>
+          <h2 className="mb-4 text-body-lg text-muted">{t('readingSpeed')}</h2>
           <input
             type="range"
             min={0.5}
@@ -134,13 +135,13 @@ export default function SettingsPage() {
             step={0.25}
             value={speed}
             onChange={(e) => setSpeed(Number(e.target.value))}
-            aria-label="Reading speed"
+            aria-label={t('readingSpeed')}
             className="mb-2 h-touch w-full accent-accent"
           />
           <div className="mb-8 flex justify-between text-caption text-muted">
-            <span>Slow</span>
-            <span>Normal</span>
-            <span>Fast</span>
+            <span>{t('slow')}</span>
+            <span>{t('normal')}</span>
+            <span>{t('fast')}</span>
           </div>
 
           <hr className="mb-2 border-hairline" />
@@ -152,7 +153,7 @@ export default function SettingsPage() {
             className="flex h-touch w-full items-center justify-between text-start text-body-lg text-white
                        disabled:opacity-70"
           >
-            Camera and location permissions
+            {t('permissions')}
             <span aria-hidden="true" className="text-muted rtl:rotate-180">›</span>
           </button>
         </div>
