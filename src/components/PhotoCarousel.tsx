@@ -114,11 +114,18 @@ export default function PhotoCarousel({ images, alt = '' }: { images: string[]; 
             <ChevronIcon />
           </button>
 
-          {/* Counter and dots are one control, on one line, above the sheet.
-              The counter used to sit top-end and collided with the directions
-              button — that corner belongs to actions, not to status. Grouping
-              the two also means the number and the dots can never disagree. */}
-          <div className="absolute inset-x-0 bottom-[42%] flex items-center justify-center gap-3">
+          {/* Counter and dots are one control, on one line, near the bottom of
+              the photo. That corner up top belongs to actions — the favourite
+              and directions buttons — so status lives down here instead, and
+              grouping the two means the number and the dots cannot disagree.
+
+              The offset is not arbitrary. This carousel fills the hero, which
+              is 45% of the screen, and the story sheet starts at 38% — so the
+              sheet hides the bottom 7/45 ≈ 16% of it. Anything below that is
+              invisible, and 42% put this in the vertical middle, level with
+              the arrows. 24% clears the sheet with room to spare and still
+              reads as the bottom of the picture. */}
+          <div className="absolute inset-x-0 bottom-[24%] flex items-center justify-center gap-3">
             <span
               className="rounded-full bg-black/50 px-2.5 py-1 label-caps text-white backdrop-blur-glass"
               // Latin digits and the slash read left-to-right even in Arabic.
