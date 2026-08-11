@@ -16,7 +16,7 @@ const MAX_BODY_BYTES = 12 * 1024 * 1024;
  */
 function apiPlugin(): Plugin {
   return {
-    name: 'rawi-api-dev',
+    name: 'darb-api-dev',
     configureServer(server: ViteDevServer) {
       server.middlewares.use(async (req, res, next) => {
         const url = req.url?.split('?')[0];
@@ -74,7 +74,7 @@ export default defineConfig(({ mode }) => {
   // on process.env — where the api/ handlers read it, and where the browser
   // bundle can never see it. In production the host supplies these directly.
   const env = loadEnv(mode, process.cwd(), '');
-  for (const key of ['GEMINI_API_KEY', 'GEMINI_MODEL', 'RAWI_CONFIDENCE_THRESHOLD']) {
+  for (const key of ['GEMINI_API_KEY', 'GEMINI_MODEL', 'DARB_CONFIDENCE_THRESHOLD']) {
     if (env[key]) process.env[key] = env[key];
   }
 

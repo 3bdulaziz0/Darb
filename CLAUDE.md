@@ -1,8 +1,8 @@
-# Rawi — working agreement
+# درب (Darb) — working agreement
 
 **Point and learn — and when we don't know, we'll tell you.**
 
-Rawi identifies heritage landmarks from a photo and tells their verified story,
+Darb identifies heritage landmarks from a photo and tells their verified story,
 with a visible source under every fact. Its defining behaviour is not what it
 knows — it is what it refuses to say.
 

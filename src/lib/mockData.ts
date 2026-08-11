@@ -52,10 +52,7 @@ export const MOCK_MATCH: MatchResult = {
   elements_seen: ['أبراج مراقبة', 'بناء طيني'],
 };
 
-/**
- * A miss — CameraPage routes this to /not-found (rule 3).
- * Flip MOCK_RESULT to this to exercise honest mode without a camera.
- */
+/** A miss — CameraPage routes this to /not-found (rule 3). */
 export const MOCK_NO_MATCH: MatchResult = {
   match_id: null,
   confidence: 0.31,
@@ -65,40 +62,6 @@ export const MOCK_NO_MATCH: MatchResult = {
 /** What the recognize() stub returns by default. Swap to MOCK_NO_MATCH to
  *  test honest mode without touching the UI. */
 export const MOCK_RESULT: MatchResult = MOCK_MATCH;
-
-// ── Temporary dev override ──────────────────────────────────────────────────
-/**
- * Forces the recognize() stub to return a null match, so the refusal path can
- * be demoed on demand from the camera screen. Toggled by the DEV chip in
- * CameraPage.
- *
- * Kept in sessionStorage rather than React state so it survives the trip to
- * /unknown and back via "Retake photo" — otherwise the toggle would reset the
- * moment you used it.
- *
- * TEMPORARY. This goes out with the rest of this file before the demo build.
- * The real refusal path comes from confidence < CONFIDENCE_THRESHOLD, not from
- * a switch. Do not let this survive into a build a judge sees.
- */
-const FORCE_NO_MATCH_KEY = 'rawi:dev:force-no-match';
-
-export function isForcedNoMatch(): boolean {
-  try {
-    return sessionStorage.getItem(FORCE_NO_MATCH_KEY) === '1';
-  } catch {
-    // Private browsing can throw on storage access. Default to honest-off.
-    return false;
-  }
-}
-
-export function setForcedNoMatch(on: boolean): void {
-  try {
-    if (on) sessionStorage.setItem(FORCE_NO_MATCH_KEY, '1');
-    else sessionStorage.removeItem(FORCE_NO_MATCH_KEY);
-  } catch {
-    // Non-fatal — the toggle just won't persist across navigation.
-  }
-}
 
 /** Element labels for honest mode. Curated glossary, not generated (T-16). */
 export const MOCK_ELEMENT_LABELS: Record<string, string> = {

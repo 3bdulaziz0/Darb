@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Rawi palette — see design/stitch_heritage_landmark_guide/nocturne_heritage/DESIGN.md
+        // Darb palette — see design/stitch_heritage_landmark_guide/nocturne_heritage/DESIGN.md
         bg: '#0E0E12',
         surface: '#1A1A22',
         'surface-high': '#23232D',

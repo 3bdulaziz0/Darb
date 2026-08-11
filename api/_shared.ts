@@ -20,7 +20,7 @@ import { GoogleGenAI } from '@google/genai';
 import type { Landmark } from '../src/lib/types';
 
 /** Below this, a match is not a match — it is a refusal (business rule 4). */
-export const CONFIDENCE_THRESHOLD = Number(process.env.RAWI_CONFIDENCE_THRESHOLD) || 0.8;
+export const CONFIDENCE_THRESHOLD = Number(process.env.DARB_CONFIDENCE_THRESHOLD) || 0.8;
 
 /** Conservative default. Override with GEMINI_MODEL once you know your access. */
 export const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';

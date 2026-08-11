@@ -11,11 +11,11 @@
  * rejected, and sub-threshold confidence becomes a refusal. This file is the
  * transport, and it is deliberately thin.
  *
- * Set VITE_RAWI_USE_STUB=1 to work offline without burning API calls.
+ * Set VITE_DARB_USE_STUB=1 to work offline without burning API calls.
  */
 
 import type { Coordinates, MatchResult } from './types';
-import { MOCK_RESULT, MOCK_NO_MATCH, isForcedNoMatch } from './mockData';
+import { MOCK_RESULT } from './mockData';
 
 export interface RecognizeInput {
   /** Captured frame as a data URL. */
@@ -35,7 +35,7 @@ const TIMEOUT_MS = 30_000;
 /** A refusal, used whenever we cannot get a trustworthy answer. */
 const REFUSAL: MatchResult = { match_id: null, confidence: 0, elements_seen: [] };
 
-const useStub = import.meta.env.VITE_RAWI_USE_STUB === '1';
+const useStub = import.meta.env.VITE_DARB_USE_STUB === '1';
 
 /**
  * Resolve a captured frame to a landmark, or to an explicit non-match.
@@ -44,12 +44,8 @@ const useStub = import.meta.env.VITE_RAWI_USE_STUB === '1';
  *          Callers route that to /not-found and show no name, date or story.
  */
 export async function recognize(input: RecognizeInput): Promise<MatchResult> {
-  // The dev chip on the camera screen, and the offline stub, both short-circuit
-  // here. Both go out with mockData.ts before the demo build.
-  if (isForcedNoMatch()) {
-    await new Promise((r) => setTimeout(r, 600));
-    return MOCK_NO_MATCH;
-  }
+  // The offline stub short-circuits here, so the app can be worked on without
+  // a key or a network. It goes out with mockData.ts before the demo build.
   if (useStub) {
     await new Promise((r) => setTimeout(r, 600));
     return MOCK_RESULT;

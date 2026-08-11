@@ -7,7 +7,7 @@
  */
 interface ImportMetaEnv {
   /** Set to '1' to use the offline stub instead of calling the model. */
-  readonly VITE_RAWI_USE_STUB?: string;
+  readonly VITE_DARB_USE_STUB?: string;
 }
 
 interface ImportMeta {

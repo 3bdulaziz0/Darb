@@ -5,12 +5,11 @@
  *        JPEG, tracks stopped on unmount, permission-repair message with an
  *        upload fallback, location read once on mount with a status pill,
  *        and the processing state over the frozen frame.
- * TODO:  1. Delete <DevRefusalToggle/> and its wiring before the demo build.
- *        2. Frame quality check — reject blurred or dark frames before
+ * TODO:  1. Frame quality check — reject blurred or dark frames before
  *           spending a model call on them (T-9).
- *        3. The permission primer from design/permissions_access, shown
+ *        2. The permission primer from design/permissions_access, shown
  *           before the browser's own prompt.
- *        4. Manual district selection when location is denied. Today a denied
+ *        3. Manual district selection when location is denied. Today a denied
  *           fix falls back to the whole library with a caveat, which is the
  *           behaviour the PRD asks for but not yet the UI.
  *
@@ -25,7 +24,6 @@ import { useLang } from '../lib/i18n';
 import { isRecognisable, loadLandmarks, selectCandidates } from '../lib/library';
 import { getPosition } from '../lib/location';
 import { recognize } from '../lib/recognize';
-import { isForcedNoMatch, setForcedNoMatch } from '../lib/mockData';
 import type { Capture, Stage } from '../lib/types';
 
 /** Longest edge of a captured frame, in pixels. */
@@ -160,41 +158,6 @@ function LocationPill({ status }: { status: LocationStatus }) {
       <PinIcon />
       <span className="label-caps">{text}</span>
     </span>
-  );
-}
-
-/**
- * TEMPORARY dev affordance — forces recognize() to return match_id: null so
- * the refusal path can be demoed without hunting for an unregistered building.
- * DELETE THIS, along with lib/mockData.ts, before the demo build.
- */
-function DevRefusalToggle() {
-  const [forced, setForced] = useState(isForcedNoMatch);
-
-  function toggle() {
-    const next = !forced;
-    setForcedNoMatch(next);
-    setForced(next);
-  }
-
-  return (
-    <button
-      type="button"
-      onClick={toggle}
-      aria-pressed={forced}
-      className={[
-        'flex h-touch items-center gap-2 rounded-ctl border border-dashed px-3 backdrop-blur-glass transition-colors',
-        forced
-          ? 'border-[#ffb4ab] bg-[#93000a]/70 text-[#ffdad6]'
-          : 'border-white/40 bg-black/40 text-white/70',
-      ].join(' ')}
-    >
-      <span
-        aria-hidden="true"
-        className={['h-2 w-2 rounded-full', forced ? 'bg-[#ffb4ab]' : 'bg-white/40'].join(' ')}
-      />
-      <span className="label-caps">DEV · force no match {forced ? 'on' : 'off'}</span>
-    </button>
   );
 }
 
@@ -482,11 +445,6 @@ export default function CameraPage() {
         >
           {lang === 'ar' ? 'EN' : 'ع'}
         </button>
-      </div>
-
-      {/* TEMPORARY — remove with mockData.ts before the demo build. */}
-      <div className="absolute inset-x-0 top-[76px] z-10 flex justify-center px-gutter">
-        <DevRefusalToggle />
       </div>
 
       {showViewfinder && (

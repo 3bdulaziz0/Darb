@@ -1,4 +1,4 @@
-# Rawi (راوي)
+# درب · Darb
 
 A mobile-first web app: point your camera at a heritage landmark, get its
 verified story — with a visible source under every fact. When the landmark is
@@ -32,7 +32,7 @@ Get a key at https://aistudio.google.com/apikey. On the hosting platform, set
 `GEMINI_API_KEY` in the project's environment variables — never in the repo.
 
 No key? The app still runs. Recognition returns a clear error, and you can set
-`VITE_RAWI_USE_STUB=1` in `.env` to use the offline stub instead.
+`VITE_DARB_USE_STUB=1` in `.env` to use the offline stub instead.
 
 ```bash
 npm run dev
@@ -67,11 +67,8 @@ those flagged `test_ready` are ever submitted. Anything else, including a
 sub-threshold confidence, becomes `match_id: null` and routes to the refusal
 screen. Both rules are enforced on the server and again on the client.
 
-To demo the refusal path, tap the dashed **DEV · FORCE NO MATCH** chip on the
-camera screen, then tap the shutter. It forces the stub to return
-`match_id: null`, and the setting survives "Retake photo" so you can run the
-loop repeatedly. It is temporary scaffolding — it goes out with
-`src/lib/mockData.ts` before the demo build.
+To demo the refusal path, photograph something that is not one of the ten
+test-ready landmarks. That is the real path, and it is the one worth showing.
 
 Other scripts:
 
@@ -123,8 +120,8 @@ It is fiddly. The preview URL is easier.
 4. The rear camera should fill the screen and the pill top-start should change
    from `LOCATING…` to `±N M`.
 5. Tap the shutter. The frame freezes, dims, and the Arabic stages run.
-6. It lands on Masmak Fort, because `recognize()` is still a stub and always
-   returns that. Tap the dashed **DEV** chip and shoot again for the refusal.
+6. Point it at one of the ten test-ready landmarks for a match, or at
+   anything else to see the refusal.
 
 If the screen stays black and you see "This page is not secure", you are on
 `http://`. That is the HTTPS problem above, not a bug.

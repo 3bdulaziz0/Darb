@@ -12,8 +12,8 @@
 import { defaultVoiceId, findVoice } from './voices';
 import type { Lang } from './types';
 
-const VOICE_KEY = 'rawi:voice';
-const RATE_KEY = 'rawi:rate';
+const VOICE_KEY = 'darb:voice';
+const RATE_KEY = 'darb:rate';
 
 const listeners = new Set<() => void>();
 

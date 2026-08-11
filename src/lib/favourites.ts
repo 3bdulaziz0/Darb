@@ -13,7 +13,7 @@
  * Tuesday should still be there when you go on Saturday.
  */
 
-const KEY = 'rawi:favourites';
+const KEY = 'darb:favourites';
 
 /** Notified whenever the set changes, so every star re-renders together. */
 const listeners = new Set<() => void>();

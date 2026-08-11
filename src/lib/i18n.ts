@@ -22,7 +22,7 @@ import type { Lang } from './types';
 /** Arabic is the product's primary content language, so it is the default. */
 export const DEFAULT_LANG: Lang = 'ar';
 
-const KEY = 'rawi:lang';
+const KEY = 'darb:lang';
 
 export function readStoredLang(): Lang {
   try {
