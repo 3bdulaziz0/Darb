@@ -113,7 +113,7 @@
     ],
     "lat": 26.689361,
     "lng": 37.9815,
-    "image": "/landmarks/lm_elephant_rock/01-al-ulla-hijaz-railway.jpg",
+    "image": "/landmarks/lm_elephant_rock/01.jpg",
     "elements": [
       "حجر رملي",
       "تعرية طبيعية",
@@ -187,14 +187,14 @@
     },
     "test_ready": true,
     "reference_images": [
-      "/landmarks/lm_elephant_rock/01-al-ulla-hijaz-railway.jpg",
-      "/landmarks/lm_elephant_rock/02-ottoman-fort-at-hegra.jpg",
-      "/landmarks/lm_elephant_rock/03-banyan-tree-alula-pool.jpg",
-      "/landmarks/lm_elephant_rock/04-banyan-tree-alula.jpg",
-      "/landmarks/lm_elephant_rock/05-alula-canal.jpg",
-      "/landmarks/lm_elephant_rock/06-al-ula-6714550333.jpg",
-      "/landmarks/lm_elephant_rock/07-al-ula-6708826341.jpg",
-      "/landmarks/lm_elephant_rock/08-al-ula-6708183213.jpg"
+      "/landmarks/lm_elephant_rock/01.jpg",
+      "/landmarks/lm_elephant_rock/02.jpg",
+      "/landmarks/lm_elephant_rock/03.jpg",
+      "/landmarks/lm_elephant_rock/04.jpg",
+      "/landmarks/lm_elephant_rock/05.jpg",
+      "/landmarks/lm_elephant_rock/06.jpg",
+      "/landmarks/lm_elephant_rock/07.jpg",
+      "/landmarks/lm_elephant_rock/08.jpg"
     ]
   },
   {
@@ -3818,7 +3818,8 @@
       "/landmarks/lm_alula_preserved_tombs_and_ancient_wonders_at_h/05-qasr-al-farid-hegra-madain-salih-1st-cen.jpg",
       "/landmarks/lm_alula_preserved_tombs_and_ancient_wonders_at_h/06-qasr-al-farid-hegra-madain-salih-1st-cen.jpg",
       "/landmarks/lm_alula_preserved_tombs_and_ancient_wonders_at_h/07-madain-saleh-6811791359.jpg",
-      "/landmarks/lm_alula_preserved_tombs_and_ancient_wonders_at_h/08-madain-saleh-6735708141.jpg"
+      "/landmarks/lm_alula_preserved_tombs_and_ancient_wonders_at_h/08-madain-saleh-6735708141.jpg",
+      "/landmarks/lm_alula_preserved_tombs_and_ancient_wonders_at_h/09.jpg"
     ]
   },
   {
@@ -4702,7 +4703,7 @@
     "name_en": "Historic Jeddah",
     "lat": 21.48488,
     "lng": 39.183555,
-    "image": "/landmarks/lm_jeddah_historic_jeddah/01-traditional-house-interior-in-historic-j.jpg",
+    "image": "/landmarks/lm_jeddah_historic_jeddah/01.jpg",
     "facts": [
       {
         "text_ar": "قبل أن تُسمّى ميناءً ملكيًا لمكة المكرمة عام 657م، كان موقع البلد «جدة التاريخية» قائمًا على أرض ساحلية جميلة.",
@@ -4796,14 +4797,14 @@
     },
     "test_ready": true,
     "reference_images": [
-      "/landmarks/lm_jeddah_historic_jeddah/01-traditional-house-interior-in-historic-j.jpg",
-      "/landmarks/lm_jeddah_historic_jeddah/02-joyerias-de-al-balad-jeddah.jpg",
-      "/landmarks/lm_jeddah_historic_jeddah/03-albalad-coralhouses.jpg",
-      "/landmarks/lm_jeddah_historic_jeddah/04-comercio-en-al-balad-jeddah.jpg",
-      "/landmarks/lm_jeddah_historic_jeddah/05-al-balad-jeddah.jpg",
-      "/landmarks/lm_jeddah_historic_jeddah/06-bait-al-balad-jeddah-1.jpg",
-      "/landmarks/lm_jeddah_historic_jeddah/07-bait-al-balad-jeddah-3.jpg",
-      "/landmarks/lm_jeddah_historic_jeddah/08-bait-al-balad-jeddah-2.jpg"
+      "/landmarks/lm_jeddah_historic_jeddah/01.jpg",
+      "/landmarks/lm_jeddah_historic_jeddah/02.png",
+      "/landmarks/lm_jeddah_historic_jeddah/03.jpg",
+      "/landmarks/lm_jeddah_historic_jeddah/04.jpg",
+      "/landmarks/lm_jeddah_historic_jeddah/05.png",
+      "/landmarks/lm_jeddah_historic_jeddah/06.jpg",
+      "/landmarks/lm_jeddah_historic_jeddah/07.jpg",
+      "/landmarks/lm_jeddah_historic_jeddah/08.jpg"
     ]
   },
   {
@@ -5346,7 +5347,7 @@
     "name_en": "Quba Mosque",
     "lat": 24.439478,
     "lng": 39.617195,
-    "image": "/landmarks/lm_madinah_quba_mosque/01-masjid-quba-umroh-ramadhan-2023-3.jpg",
+    "image": "/landmarks/lm_madinah_quba_mosque/01.jpg",
     "facts": [
       {
         "text_ar": "هو أول مسجد في الإسلام، وضع النبي ﷺ بيديه الشريفتين حجر أساسه، وبناه المهاجرون والأنصار.",
@@ -5410,14 +5411,14 @@
     },
     "test_ready": true,
     "reference_images": [
-      "/landmarks/lm_madinah_quba_mosque/01-masjid-quba-umroh-ramadhan-2023-3.jpg",
-      "/landmarks/lm_madinah_quba_mosque/02-madina-trip-49.jpg",
-      "/landmarks/lm_madinah_quba_mosque/03-madina-trip-50.jpg",
-      "/landmarks/lm_madinah_quba_mosque/04-madina-trip-53.jpg",
-      "/landmarks/lm_madinah_quba_mosque/05-madina-trip-60.jpg",
-      "/landmarks/lm_madinah_quba_mosque/06-madina-trip-61.jpg",
-      "/landmarks/lm_madinah_quba_mosque/07-madina-trip-66.jpg",
-      "/landmarks/lm_madinah_quba_mosque/08-madina-trip-68.jpg"
+      "/landmarks/lm_madinah_quba_mosque/01.jpg",
+      "/landmarks/lm_madinah_quba_mosque/02.jpg",
+      "/landmarks/lm_madinah_quba_mosque/03.jpg",
+      "/landmarks/lm_madinah_quba_mosque/04.jpg",
+      "/landmarks/lm_madinah_quba_mosque/05.jpg",
+      "/landmarks/lm_madinah_quba_mosque/06.jpg",
+      "/landmarks/lm_madinah_quba_mosque/07.jpg",
+      "/landmarks/lm_madinah_quba_mosque/08.jpg"
     ]
   },
   {
@@ -6502,7 +6503,7 @@
     "name_en": "Al Qarah Mountain",
     "lat": 25.411483,
     "lng": 49.692814,
-    "image": "/landmarks/lm_alahsa_al_qarah_mountain/01-path-to-jabal-algara-caves.jpg",
+    "image": "/landmarks/lm_alahsa_al_qarah_mountain/01.jpg",
     "facts": [
       {
         "text_ar": "اكتشف كهوف جبل القارة الآسرة التي تشكّلت عبر القرون بفعل عوامل طبيعية كذوبان الصخور القابلة للذوبان في الماء والتعرية وشقوق الزلازل.",
@@ -6584,14 +6585,14 @@
     },
     "test_ready": true,
     "reference_images": [
-      "/landmarks/lm_alahsa_al_qarah_mountain/01-path-to-jabal-algara-caves.jpg",
-      "/landmarks/lm_alahsa_al_qarah_mountain/02-muhammad-baqir-al-shakhs.jpg",
-      "/landmarks/lm_alahsa_al_qarah_mountain/03-off-road-tour-by-pro-jeepers-eastern-oas.jpg",
-      "/landmarks/lm_alahsa_al_qarah_mountain/04-off-road-tour-by-pro-jeepers-eastern-oas.jpg",
-      "/landmarks/lm_alahsa_al_qarah_mountain/05-off-road-tour-by-pro-jeepers-eastern-oas.jpg",
-      "/landmarks/lm_alahsa_al_qarah_mountain/06-off-road-tour-by-pro-jeepers-eastern-oas.jpg",
-      "/landmarks/lm_alahsa_al_qarah_mountain/07-off-road-tour-by-pro-jeepers-eastern-oas.jpg",
-      "/landmarks/lm_alahsa_al_qarah_mountain/08-off-road-tour-by-pro-jeepers-eastern-oas.jpg"
+      "/landmarks/lm_alahsa_al_qarah_mountain/01.jpg",
+      "/landmarks/lm_alahsa_al_qarah_mountain/02.jpg",
+      "/landmarks/lm_alahsa_al_qarah_mountain/03.jpg",
+      "/landmarks/lm_alahsa_al_qarah_mountain/04.jpg",
+      "/landmarks/lm_alahsa_al_qarah_mountain/05.jpg",
+      "/landmarks/lm_alahsa_al_qarah_mountain/06.jpg",
+      "/landmarks/lm_alahsa_al_qarah_mountain/07.jpg",
+      "/landmarks/lm_alahsa_al_qarah_mountain/08.jpg"
     ]
   },
   {
@@ -8240,7 +8241,7 @@
     "name_en": "At-Turaif",
     "lat": 25.73375,
     "lng": 46.575222,
-    "image": "/landmarks/lm_diriyah_at_turaif/01-almaarefa-colleges-indoor-7.jpg",
+    "image": "/landmarks/lm_diriyah_at_turaif/01.jpg",
     "facts": [
       {
         "text_ar": "قصور ومساجد ومنازل طينية مذهلة تشكّل هذا الموقع المدرج في قائمة التراث العالمي لليونسكو، وقد رُمّم الحي بعناية ليستعيد رونقه السابق.",
@@ -8326,14 +8327,14 @@
     },
     "test_ready": true,
     "reference_images": [
-      "/landmarks/lm_diriyah_at_turaif/01-almaarefa-colleges-indoor-7.jpg",
-      "/landmarks/lm_diriyah_at_turaif/02-almaarefa-colleges-indoor-2.jpg",
-      "/landmarks/lm_diriyah_at_turaif/03-almaarefa-colleges-indoor-3.jpg",
-      "/landmarks/lm_diriyah_at_turaif/04-almaarefa-colleges-outdoor-3.jpg",
-      "/landmarks/lm_diriyah_at_turaif/05-almaarefa-colleges-indoor-4.jpg",
-      "/landmarks/lm_diriyah_at_turaif/06-almaarefa-colleges-indoor-5.jpg",
-      "/landmarks/lm_diriyah_at_turaif/07-almaarefa-colleges-indoor-6.jpg",
-      "/landmarks/lm_diriyah_at_turaif/08-almaarefa-colleges-indoor-9.jpg"
+      "/landmarks/lm_diriyah_at_turaif/01.jpg",
+      "/landmarks/lm_diriyah_at_turaif/02.jpg",
+      "/landmarks/lm_diriyah_at_turaif/03.png",
+      "/landmarks/lm_diriyah_at_turaif/04.jpg",
+      "/landmarks/lm_diriyah_at_turaif/05.jpg",
+      "/landmarks/lm_diriyah_at_turaif/06.png",
+      "/landmarks/lm_diriyah_at_turaif/07.jpg",
+      "/landmarks/lm_diriyah_at_turaif/08.jpg"
     ]
   },
   {

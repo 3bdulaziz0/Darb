@@ -323,7 +323,7 @@ function seal(text: string, fact: Fact, lang: Lang): SourcedText {
 /**
  * Wraps a landmark's facts so their text cannot be rendered without its
  * source. Pass the result to <SourcedFact/>; there is nothing else you can
- * usefully do with it, which is the point. See CLAUDE.md, rule 2.
+ * usefully do with it, which is the point. See WORKING-AGREEMENT.md, rule 2.
  *
  * A fact with no source is dropped here rather than shown bare.
  */

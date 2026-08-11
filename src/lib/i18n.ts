@@ -12,7 +12,7 @@
  * It must never hold a landmark name, a date, a description, or anything else
  * that makes a claim about a place. Those live in landmarks.json with their
  * sources, and they are not translated by us — a fact we do not have in a
- * language is labelled "translation pending", never invented. See CLAUDE.md.
+ * language is labelled "translation pending", never invented. See WORKING-AGREEMENT.md.
  * ───────────────────────────────────────────────────────────────────────────
  */
 

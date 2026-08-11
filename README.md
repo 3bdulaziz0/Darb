@@ -6,7 +6,7 @@ not in our curated library, the app says so and describes only what it can
 actually see. It never guesses.
 
 **Facts are retrieved from a curated library. Only the phrasing is generated.**
-That separation is the product. See [CLAUDE.md](CLAUDE.md) before writing code.
+That separation is the product. See [WORKING-AGREEMENT.md](WORKING-AGREEMENT.md) before writing code.
 
 ---
 
