@@ -79,7 +79,12 @@ export default function DiscoveryPage() {
   const { lang, t } = useLang();
 
   const [library, setLibrary] = useState<Landmark[]>([]);
-  const [scope, setScope] = useState<DiscoveryScope>(5);
+  // Opens on the whole library rather than a radius. The library reaches 19
+  // cities, and a visitor is usually far from most of them — starting at 5 km
+  // showed four landmarks and made the app look almost empty. The distance
+  // sort still puts whatever is nearby at the top, so nothing is lost by
+  // starting wide, and the radius chips are there to narrow it.
+  const [scope, setScope] = useState<DiscoveryScope>('all');
   // 'favourites' is a filter, not a place type, so it is not in the Category
   // union — it sits alongside it here and nowhere else.
   const [category, setCategory] = useState<Category | 'all' | 'favourites'>('all');
