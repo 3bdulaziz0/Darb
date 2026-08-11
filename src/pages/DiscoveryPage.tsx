@@ -18,6 +18,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LandmarkCard from '../components/LandmarkCard';
+import SettingsIcon from '../components/SettingsIcon';
 import { CATEGORIES, categoryColor, categoryLabel } from '../lib/categories';
 import {
   formatDistance,
@@ -56,16 +57,6 @@ function ShutterIcon() {
   );
 }
 
-function GearIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5"
-         fill="none" stroke="currentColor" strokeWidth="1.75">
-      <circle cx="12" cy="12" r="3.2" />
-      <path d="M12 2.5v2.2M12 19.3v2.2M21.5 12h-2.2M4.7 12H2.5M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6M18.7 18.7l-1.6-1.6M6.9 6.9 5.3 5.3" />
-    </svg>
-  );
-}
-
 function BottomNav() {
   const { t } = useLang();
   return (
@@ -77,7 +68,7 @@ function BottomNav() {
         <ShutterIcon />
       </Link>
       <Link to="/settings" aria-label={t('settings')} className="control border border-hairline text-muted">
-        <GearIcon />
+        <SettingsIcon />
       </Link>
     </nav>
   );

@@ -20,6 +20,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import StatusIndicator from '../components/StatusIndicator';
+import SettingsIcon from '../components/SettingsIcon';
 import { useLang } from '../lib/i18n';
 import { isRecognisable, loadLandmarks, selectCandidates } from '../lib/library';
 import { getPosition } from '../lib/location';
@@ -118,16 +119,6 @@ function MapIcon() {
          stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round">
       <path d="m9 4 6 2 5-2v14l-5 2-6-2-5 2V6Z" />
       <path d="M9 4v14M15 6v14" />
-    </svg>
-  );
-}
-
-function GearIcon() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="none"
-         stroke="currentColor" strokeWidth="1.75">
-      <circle cx="12" cy="12" r="3.2" />
-      <path d="M12 2.5v2.2M12 19.3v2.2M21.5 12h-2.2M4.7 12H2.5M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6M18.7 18.7l-1.6-1.6M6.9 6.9 5.3 5.3" />
     </svg>
   );
 }
@@ -482,7 +473,7 @@ export default function CameraPage() {
               aria-label={t('settings')}
               className="control glass text-white"
             >
-              <GearIcon />
+              <SettingsIcon />
             </button>
           </div>
         </>
