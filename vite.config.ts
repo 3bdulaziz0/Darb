@@ -55,7 +55,9 @@ function apiPlugin(): Plugin {
           });
 
           await handler(
-            { method: req.method, body },
+            // headers are passed through because the handlers work out their
+            // own origin from them, exactly as they do in production.
+            { method: req.method, body, headers: req.headers },
             {
               status: (code: number) => ({ json: (payload: unknown) => send(code, payload) }),
             },

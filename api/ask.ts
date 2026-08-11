@@ -38,6 +38,7 @@ import {
   findLandmark,
   getClient,
   handleErrors,
+  originFrom,
   readJsonBody,
 } from './_shared';
 
@@ -110,7 +111,7 @@ export default handleErrors(async (req: ApiRequest, res: ApiResponse) => {
     throw new HttpError(400, `Question is too long (max ${MAX_QUESTION} characters).`);
   }
 
-  const landmark = findLandmark(landmark_id);
+  const landmark = await findLandmark(originFrom(req), landmark_id);
   if (!landmark) throw new HttpError(404, 'That landmark is not in the library.');
 
   // Only facts that carry a source can be quoted — same rule as the UI.
@@ -192,7 +193,7 @@ export default handleErrors(async (req: ApiRequest, res: ApiResponse) => {
  * supported by a trusted citation.
  */
 async function searchTrustedSources(
-  landmark: NonNullable<ReturnType<typeof findLandmark>>,
+  landmark: NonNullable<Awaited<ReturnType<typeof findLandmark>>>,
   question: string,
   lang: 'ar' | 'en',
 ): Promise<Record<string, unknown>> {

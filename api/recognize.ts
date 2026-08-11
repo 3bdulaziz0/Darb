@@ -30,6 +30,7 @@ import {
   findLandmark,
   getClient,
   handleErrors,
+  originFrom,
   parseDataUrl,
   readJsonBody,
   readReferenceImages,
@@ -81,8 +82,9 @@ export default handleErrors(async (req: ApiRequest, res: ApiResponse) => {
   // Resolve ids against our own copy of the library. An id the client made up
   // simply does not resolve, and an entry with nothing to compare against is
   // dropped — see guarantee 1 and rule 3 above.
-  const candidates = candidate_ids
-    .map((id) => findLandmark(id))
+  const origin = originFrom(req);
+  const resolved = await Promise.all(candidate_ids.map((id) => findLandmark(origin, id)));
+  const candidates = resolved
     .filter((l): l is NonNullable<typeof l> => Boolean(l))
     .filter((l) => l.visual_markers.length > 0 || (l.reference_images?.length ?? 0) > 0);
 
@@ -93,6 +95,10 @@ export default handleErrors(async (req: ApiRequest, res: ApiResponse) => {
   }
 
   const parts: Part[] = [{ text: SYSTEM }, { text: '\n=== CANDIDATES ===' }];
+
+  // Photos are fetched in parallel across candidates, so ten candidates cost
+  // roughly one round trip rather than ten.
+  const photos = await Promise.all(candidates.map((l) => readReferenceImages(origin, l)));
 
   candidates.forEach((landmark, i) => {
     parts.push({
@@ -105,7 +111,7 @@ export default handleErrors(async (req: ApiRequest, res: ApiResponse) => {
           : 'visual markers: none written yet\n'),
     });
 
-    const refs = readReferenceImages(landmark);
+    const refs = photos[i];
     if (refs.length) {
       parts.push({ text: `reference photographs of ${landmark.name_en}:` });
       parts.push(...refs);

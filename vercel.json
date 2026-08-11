@@ -1,0 +1,27 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "functions": {
+    "api/*.ts": {
+      "maxDuration": 60
+    }
+  },
+  "rewrites": [
+    {
+      "source": "/((?!api/).*)",
+      "destination": "/index.html"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/(landmarks|images)/(.*)",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=86400" }]
+    },
+    {
+      "source": "/landmarks.json",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=60, s-maxage=3600" }]
+    }
+  ]
+}

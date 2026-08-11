@@ -91,6 +91,39 @@ npm run build
 
 ---
 
+## Deploying
+
+The app is a static site plus three serverless functions. It is configured for
+Vercel in `vercel.json`, and the same shape works on any host that serves a
+folder and runs functions from `api/`.
+
+1. Import the repository on the hosting platform. `vercel.json` already sets
+   the build command, the output directory, the SPA fallback and a 60-second
+   function timeout — recognition with several candidates takes a few seconds.
+2. Set **`GEMINI_API_KEY`** in the project's environment variables, for every
+   environment you intend to use. It is the only required one. `GEMINI_MODEL`,
+   `GEMINI_TTS_MODEL` and `DARB_CONFIDENCE_THRESHOLD` are optional overrides.
+   Never put the key in the repository.
+3. Deploy, then open the URL on a real phone and check the camera, since that
+   is the one thing localhost cannot prove.
+
+### Why the functions fetch their own files
+
+`api/_shared.ts` loads `landmarks.json` and the reference photographs over
+HTTPS from the deployment's own origin, rather than reading them off disk.
+
+A serverless function is bundled separately from the static files. `public/`
+goes to the CDN and is **not** in the function's filesystem, so `readFileSync`
+would work locally and throw `ENOENT` in production. Fetching also keeps the
+function small: 108 MB of photographs stay on the CDN instead of being packed
+into a bundle with a 250 MB ceiling. Both are cached in module scope, so a warm
+function pays the cost once.
+
+The origin is read from the request headers, so a preview deployment fetches
+its own assets rather than production's.
+
+---
+
 ## ⚠️ Camera and geolocation need HTTPS
 
 `getUserMedia` and the Geolocation API only work in a **secure context**.

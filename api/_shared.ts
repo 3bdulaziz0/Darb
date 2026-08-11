@@ -11,11 +11,20 @@
  *   2. The grounding prompt and the response schema stay here, so they cannot
  *      be edited from the client. If a visitor could rewrite the prompt, every
  *      guarantee this product makes about refusal would be theirs to remove.
+ *
+ * ── Why the library is fetched rather than read off disk ───────────────────
+ * These run as serverless functions, and a serverless function is bundled
+ * separately from the site's static files. `public/` is uploaded to the CDN;
+ * it is NOT in the function's filesystem, so readFileSync(process.cwd() +
+ * '/public/...') works in local dev and throws ENOENT in production.
+ *
+ * Fetching over HTTPS from our own origin fixes that and keeps the function
+ * small: 108 MB of reference photographs stay on the CDN instead of being
+ * packed into a bundle with a 250 MB ceiling. Both the library and the photos
+ * are cached in module scope, so a warm function pays the cost once.
  * ───────────────────────────────────────────────────────────────────────────
  */
 
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { GoogleGenAI } from '@google/genai';
 import type { Landmark } from '../src/lib/types';
 
@@ -27,6 +36,9 @@ export const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
 
 /** At most this many reference photographs per candidate go into a prompt. */
 export const REFS_PER_CANDIDATE = 2;
+
+/** Give up on a static asset rather than hanging the whole request. */
+const ASSET_TIMEOUT_MS = 8000;
 
 export function getClient(): GoogleGenAI {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -50,54 +62,118 @@ export class HttpError extends Error {
   }
 }
 
-// ── The library, server side ────────────────────────────────────────────────
+// ── Where our own static files live ─────────────────────────────────────────
 
-let cached: Landmark[] | null = null;
+function headerValue(headers: ApiRequest['headers'], name: string): string | undefined {
+  const raw = headers?.[name];
+  return Array.isArray(raw) ? raw[0] : raw;
+}
 
 /**
- * Loads the curated library from disk.
+ * The base URL of this deployment, taken from the request that arrived.
+ *
+ * Read from headers rather than a platform-specific variable so the same code
+ * works on any host and on localhost, and so a preview deployment fetches its
+ * own assets rather than production's.
+ */
+export function originFrom(req: ApiRequest): string {
+  const host = headerValue(req.headers, 'x-forwarded-host') ?? headerValue(req.headers, 'host');
+
+  if (host) {
+    const proto =
+      headerValue(req.headers, 'x-forwarded-proto') ??
+      (host.startsWith('localhost') || host.startsWith('127.0.0.1') ? 'http' : 'https');
+    return `${proto}://${host}`;
+  }
+
+  // No request context to read — fall back to what the platform tells us.
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  throw new HttpError(500, 'Could not work out this site’s own address.');
+}
+
+async function fetchAsset(url: string): Promise<Response> {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), ASSET_TIMEOUT_MS);
+  try {
+    const response = await fetch(url, { signal: controller.signal });
+    if (!response.ok) throw new HttpError(502, `Could not load ${url} (${response.status}).`);
+    return response;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+// ── The library ─────────────────────────────────────────────────────────────
+
+let cached: { origin: string; data: Landmark[] } | null = null;
+
+/**
+ * Loads the curated library from our own static files.
  *
  * The client sends candidate ids, never landmark content. Everything the model
  * is allowed to see is read here, from the file we control — so a client
  * cannot inject a fake landmark, fake markers, or a fake fact.
  */
-export function loadLibrary(): Landmark[] {
-  if (!cached) {
-    const file = join(process.cwd(), 'public', 'landmarks.json');
-    cached = JSON.parse(readFileSync(file, 'utf8')) as Landmark[];
-  }
-  return cached;
+export async function loadLibrary(origin: string): Promise<Landmark[]> {
+  if (cached?.origin === origin) return cached.data;
+
+  const response = await fetchAsset(`${origin}/landmarks.json`);
+  const data = (await response.json()) as Landmark[];
+  cached = { origin, data };
+  return data;
 }
 
-export function findLandmark(id: string): Landmark | undefined {
-  return loadLibrary().find((l) => l.id === id);
+export async function findLandmark(origin: string, id: string): Promise<Landmark | undefined> {
+  return (await loadLibrary(origin)).find((l) => l.id === id);
 }
+
+// ── Reference photographs ───────────────────────────────────────────────────
+
+interface InlinePart {
+  inlineData: { mimeType: string; data: string };
+}
+
+/** Photos never change within a deployment, so a warm function fetches once. */
+const photoCache = new Map<string, InlinePart>();
 
 /**
- * Reads a landmark's reference photographs off disk as base64.
+ * Fetches a landmark's reference photographs as base64.
  *
  * Capped per candidate: a prompt carrying eight photos each for ten candidates
- * is slow and expensive, and adds little over two good angles.
+ * is slow and expensive, and adds little over two good angles. A photo that
+ * fails to load is skipped rather than failing the request — the candidate
+ * simply goes in with fewer pictures.
  */
-export function readReferenceImages(landmark: Landmark, limit = REFS_PER_CANDIDATE) {
+export async function readReferenceImages(
+  origin: string,
+  landmark: Landmark,
+  limit = REFS_PER_CANDIDATE,
+): Promise<InlinePart[]> {
   const paths = (landmark.reference_images ?? []).slice(0, limit);
-  return paths.flatMap((p) => {
-    try {
-      const file = join(process.cwd(), 'public', p.replace(/^\//, ''));
-      return [
-        {
+
+  const parts = await Promise.all(
+    paths.map(async (path): Promise<InlinePart | null> => {
+      const cachedPart = photoCache.get(path);
+      if (cachedPart) return cachedPart;
+
+      try {
+        const response = await fetchAsset(`${origin}${path}`);
+        const buffer = await response.arrayBuffer();
+        const part: InlinePart = {
           inlineData: {
-            mimeType: p.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg',
-            data: readFileSync(file).toString('base64'),
+            mimeType: path.toLowerCase().endsWith('.png') ? 'image/png' : 'image/jpeg',
+            data: Buffer.from(buffer).toString('base64'),
           },
-        },
-      ];
-    } catch {
-      // A missing file must not take the whole request down. The candidate
-      // simply goes in with fewer photos.
-      return [];
-    }
-  });
+        };
+        photoCache.set(path, part);
+        return part;
+      } catch {
+        return null;
+      }
+    }),
+  );
+
+  return parts.filter((p): p is InlinePart => p !== null);
 }
 
 /** Splits a data URL into the pieces the SDK wants. */
@@ -113,6 +189,7 @@ export function parseDataUrl(dataUrl: string): { mimeType: string; data: string 
 export interface ApiRequest {
   method?: string;
   body?: unknown;
+  headers?: Record<string, string | string[] | undefined>;
 }
 export interface ApiResponse {
   status: (code: number) => ApiResponse;
