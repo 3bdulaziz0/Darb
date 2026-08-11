@@ -29,7 +29,7 @@
  * ───────────────────────────────────────────────────────────────────────────
  */
 
-import { isTrustedSource } from './_trusted';
+import { isTrustedSource } from './_trusted.js';
 import {
   HttpError,
   MODEL,
@@ -40,7 +40,7 @@ import {
   handleErrors,
   originFrom,
   readJsonBody,
-} from './_shared';
+} from './_shared.js';
 
 interface Body {
   landmark_id?: string;

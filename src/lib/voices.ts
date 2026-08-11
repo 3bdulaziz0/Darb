@@ -18,7 +18,7 @@
  * limit.
  */
 
-import type { Lang } from './types';
+import type { Lang } from './types.js';
 
 export interface VoiceOption {
   /** Our id, and what the client sends to /api/speak. */

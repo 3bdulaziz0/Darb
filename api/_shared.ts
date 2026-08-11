@@ -26,13 +26,20 @@
  */
 
 import { GoogleGenAI } from '@google/genai';
-import type { Landmark } from '../src/lib/types';
+import type { Landmark } from '../src/lib/types.js';
 
 /** Below this, a match is not a match — it is a refusal (business rule 4). */
 export const CONFIDENCE_THRESHOLD = Number(process.env.DARB_CONFIDENCE_THRESHOLD) || 0.8;
 
-/** Conservative default. Override with GEMINI_MODEL once you know your access. */
-export const MODEL = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
+/**
+ * Default text model. Override with GEMINI_MODEL.
+ *
+ * This used to default to gemini-2.5-flash, which Google has retired for new
+ * keys — it returns 404 "no longer available to new users". A deployment that
+ * set only GEMINI_API_KEY therefore failed on every request while the site
+ * itself looked fine, which is a miserable thing to debug.
+ */
+export const MODEL = process.env.GEMINI_MODEL || 'gemini-3.1-flash-lite';
 
 /** At most this many reference photographs per candidate go into a prompt. */
 export const REFS_PER_CANDIDATE = 2;

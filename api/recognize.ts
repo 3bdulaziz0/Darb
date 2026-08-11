@@ -34,7 +34,7 @@ import {
   parseDataUrl,
   readJsonBody,
   readReferenceImages,
-} from './_shared';
+} from './_shared.js';
 
 interface Body {
   frame?: string;

@@ -22,8 +22,8 @@ import {
   getClient,
   handleErrors,
   readJsonBody,
-} from './_shared';
-import { findVoice } from '../src/lib/voices';
+} from './_shared.js';
+import { findVoice } from '../src/lib/voices.js';
 
 interface Body {
   text?: string;
@@ -31,8 +31,14 @@ interface Body {
   lang?: 'ar' | 'en';
 }
 
-/** Conservative default; override with GEMINI_TTS_MODEL. */
-const TTS_MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-2.5-flash-preview-tts';
+/**
+ * Default speech model. Override with GEMINI_TTS_MODEL.
+ *
+ * Speech needs a model built for it. A general text model accepts the request,
+ * answers, and simply returns no audio part — so this must never be set to
+ * whatever GEMINI_MODEL is.
+ */
+const TTS_MODEL = process.env.GEMINI_TTS_MODEL || 'gemini-3.1-flash-tts-preview';
 
 /**
  * Roughly 90 seconds of speech.
@@ -107,8 +113,9 @@ export default handleErrors(async (req: ApiRequest, res: ApiResponse) => {
   if (!data) {
     throw new HttpError(
       502,
-      `The model returned no audio. Check that ${TTS_MODEL} is available to your key, ` +
-        'or set GEMINI_TTS_MODEL to one that is.',
+      `${TTS_MODEL} returned no audio. That usually means it is a text model ` +
+        'rather than a speech one — set GEMINI_TTS_MODEL to a *-tts model, or ' +
+        'leave it unset to use the default.',
     );
   }
 

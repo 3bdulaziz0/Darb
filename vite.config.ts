@@ -75,9 +75,15 @@ export default defineConfig(({ mode }) => {
   // API key deliberately has no prefix, so we load .env ourselves and put it
   // on process.env — where the api/ handlers read it, and where the browser
   // bundle can never see it. In production the host supplies these directly.
+  //
+  // Everything without the prefix is forwarded, rather than a hand-written
+  // list: the list had already fallen behind — GEMINI_TTS_MODEL was in .env
+  // and never reached the server, so narration silently used the wrong model.
+  // A hosting platform supplies these to its functions directly, so this loop
+  // is only for `npm run dev`.
   const env = loadEnv(mode, process.cwd(), '');
-  for (const key of ['GEMINI_API_KEY', 'GEMINI_MODEL', 'DARB_CONFIDENCE_THRESHOLD']) {
-    if (env[key]) process.env[key] = env[key];
+  for (const [key, value] of Object.entries(env)) {
+    if (!key.startsWith('VITE_') && value) process.env[key] = value;
   }
 
   return {
