@@ -256,6 +256,32 @@ landmark's facts and requires the model to return which ones it used. An
 answer citing nothing is returned as not-covered, because unsourced prose is
 the thing this product exists to refuse.
 
+### Answering from outside the library
+
+When the facts do not cover a question, `api/ask.ts` runs a **second stage**: a
+Google-grounded search restricted to the domains in `api/_trusted.ts`.
+
+This is retrieval, not recall. The rule has not moved — every claim still
+arrives with a source someone can open. What changed is that the source may now
+be UNESCO or Saudipedia rather than our own file, and the UI says so: a web
+answer is rendered in a different style, labelled "not in our library", and
+carries a caution that nobody on this team vetted it.
+
+Four things make it safe, and none may be removed:
+
+1. `tools: [{ googleSearch: {} }]` — without it the model answers from memory
+   and there is nothing to check it against.
+2. Every returned citation is filtered through `isTrustedSource()`. A travel
+   blog or a forum is not evidence.
+3. **No trusted citation means no answer.** Not a hedge, not a caveat — the
+   same refusal as before, one step later.
+4. A failed search returns `unavailable`, never `none`. "We looked and found
+   nothing" and "we could not look" are different statements, and telling a
+   visitor the first when the second is true is a small lie.
+
+Grounded search has its own quota, separate from ordinary generation, so
+stage 2 can be unavailable while stage 1 works.
+
 ---
 
 ## Style

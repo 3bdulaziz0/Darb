@@ -107,23 +107,43 @@ describe('recognize', () => {
 });
 
 describe('ask', () => {
-  it('returns a covered answer with the facts it cited', async () => {
-    mockFetch({ covered: true, answer: 'نص الإجابة', fact_indexes: [0, 2] });
+  it('returns a library answer with the facts it cited', async () => {
+    mockFetch({ source: 'library', answer: 'نص الإجابة', fact_indexes: [0, 2] });
     const result = await ask('lm_masmak', 'متى بُني؟', 'ar');
-    expect(result).toEqual({ covered: true, answer: 'نص الإجابة', fact_indexes: [0, 2] });
+    expect(result).toEqual({ source: 'library', answer: 'نص الإجابة', fact_indexes: [0, 2] });
   });
 
-  it('treats an answer that cites nothing as not covered', async () => {
-    // Unsourced prose is exactly what this product refuses to show, so an
-    // answer with no citation is not an answer.
-    mockFetch({ covered: true, answer: 'كلام بلا مصدر', fact_indexes: [] });
+  it('treats a library answer that cites no fact as no answer', async () => {
+    // Unsourced prose is exactly what this product refuses to show.
+    mockFetch({ source: 'library', answer: 'كلام بلا مصدر', fact_indexes: [] });
+    expect((await ask('lm_masmak', 'س', 'ar')).source).toBe('none');
+  });
+
+  it('returns a web answer with its citations', async () => {
+    mockFetch({
+      source: 'web',
+      answer: 'إجابة من مصدر خارجي',
+      citations: [{ title: 'unesco.org', uri: 'https://whc.unesco.org/en/list/1293' }],
+    });
     const result = await ask('lm_masmak', 'س', 'ar');
-    expect(result.covered).toBe(false);
+    expect(result.source).toBe('web');
+    if (result.source === 'web') expect(result.citations).toHaveLength(1);
   });
 
-  it('passes through an explicit not-covered', async () => {
-    mockFetch({ covered: false });
-    const result = await ask('lm_masmak', 'كم عدد سكان الرياض؟', 'ar');
-    expect(result.covered).toBe(false);
+  it('treats a web answer that cites nothing as no answer', async () => {
+    // The server already refuses these; this is the second lock. A web answer
+    // without a citation is the model talking from memory.
+    mockFetch({ source: 'web', answer: 'كلام بلا مصدر', citations: [] });
+    expect((await ask('lm_masmak', 'س', 'ar')).source).toBe('none');
+  });
+
+  it('drops a citation with no url', async () => {
+    mockFetch({ source: 'web', answer: 'نص', citations: [{ title: 'unesco.org', uri: '' }] });
+    expect((await ask('lm_masmak', 'س', 'ar')).source).toBe('none');
+  });
+
+  it('passes through an explicit no-answer', async () => {
+    mockFetch({ source: 'none' });
+    expect((await ask('lm_masmak', 'كم عدد سكان الرياض؟', 'ar')).source).toBe('none');
   });
 });

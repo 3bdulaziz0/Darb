@@ -104,6 +104,11 @@ const en = {
     'Our sources do not cover that. I will not answer it from anywhere else.',
   askFailed: 'That did not go through. Try again.',
   answerFrom: 'Answered from',
+  fromOutsideLibrary: 'Not in our library — found in trusted sources',
+  webSourceCaution:
+    'We did not curate this. Check the source before you rely on it.',
+  searchUnavailable:
+    'Our sources do not cover it, and I could not search right now. I would rather say that than guess.',
   preparingAudio: 'Preparing the voice…',
   deviceVoice: 'Device voice',
 
@@ -183,6 +188,10 @@ const ar: Record<keyof typeof en, string> = {
   notInOurSources: 'مصادرنا لا تغطّي هذا السؤال، ولن أجيب عليه من مكان آخر.',
   askFailed: 'لم تكتمل العملية. حاول مرة أخرى.',
   answerFrom: 'الإجابة مأخوذة من',
+  fromOutsideLibrary: 'ليست في مكتبتنا — وجدتها في مصادر موثوقة',
+  webSourceCaution: 'هذه لم نراجعها بأنفسنا. تحقّق من المصدر قبل الاعتماد عليها.',
+  searchUnavailable:
+    'مصادرنا لا تغطّي هذا، وتعذّر عليّ البحث الآن. أفضّل أن أقول ذلك على أن أخمّن.',
   preparingAudio: 'يُجهَّز الصوت…',
   deviceVoice: 'صوت الجهاز',
 

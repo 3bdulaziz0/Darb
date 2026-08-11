@@ -30,7 +30,7 @@ import { categoryColor, categoryLabel } from '../lib/categories';
 import { getLandmark, loadLandmarks, mapsUrl, sealFacts, withDistance } from '../lib/library';
 import { useLang } from '../lib/i18n';
 import { MOCK_ELEMENT_LABELS } from '../lib/mockData';
-import { ask } from '../lib/recognize';
+import { ask, type Citation } from '../lib/recognize';
 import { isSpeechAvailable, speak, stopSpeaking } from '../lib/speech';
 import { getRate, getVoiceId } from '../lib/narration';
 import { findVoice, voiceLabel, voicesFor } from '../lib/voices';
@@ -49,6 +49,16 @@ function PlayIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6" fill="currentColor">
       <path d="M8 5.5v13l11-6.5-11-6.5Z" />
+    </svg>
+  );
+}
+
+function GlobeIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-4 w-4 shrink-0"
+         fill="none" stroke="currentColor" strokeWidth="1.75">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3c2.5 2.7 2.5 15.3 0 18M12 3c-2.5 2.7-2.5 15.3 0 18" />
     </svg>
   );
 }
@@ -102,8 +112,10 @@ export default function StoryPage() {
   const [question, setQuestion] = useState('');
   const [asking, setAsking] = useState(false);
   const [answer, setAnswer] = useState<
-    | { kind: 'covered'; text: string; fact_indexes: number[] }
+    | { kind: 'library'; text: string; fact_indexes: number[] }
+    | { kind: 'web'; text: string; citations: Citation[] }
     | { kind: 'uncovered' }
+    | { kind: 'unavailable' }
     | { kind: 'failed' }
     | null
   >(null);
@@ -205,9 +217,13 @@ export default function StoryPage() {
     try {
       const result = await ask(landmark.id, q, lang);
       setAnswer(
-        result.covered
-          ? { kind: 'covered', text: result.answer, fact_indexes: result.fact_indexes }
-          : { kind: 'uncovered' },
+        result.source === 'library'
+          ? { kind: 'library', text: result.answer, fact_indexes: result.fact_indexes }
+          : result.source === 'web'
+            ? { kind: 'web', text: result.answer, citations: result.citations }
+            : result.source === 'unavailable'
+              ? { kind: 'unavailable' }
+              : { kind: 'uncovered' },
       );
       setQuestion('');
     } catch {
@@ -381,7 +397,7 @@ export default function StoryPage() {
             <div ref={answerRef} className="mb-8 rounded-sheet border border-hairline bg-surface-high/40 p-4">
               {asking && <p className="text-body text-muted">{t('thinking')}</p>}
 
-              {!asking && answer?.kind === 'covered' && (
+              {!asking && answer?.kind === 'library' && (
                 <>
                   <p className="mb-3 text-body text-white/90">{answer.text}</p>
                   <p className="mb-2 label-caps text-muted">{t('answerFrom')}</p>
@@ -399,8 +415,31 @@ export default function StoryPage() {
                 </>
               )}
 
+              {/* A web answer is styled unlike a curated one on purpose. It
+                  is sourced, but nobody on this team vetted it, and the
+                  visitor is told so before they read it. */}
+              {!asking && answer?.kind === 'web' && (
+                <>
+                  <p className="mb-3 flex items-center gap-2 label-caps text-sand">
+                    <GlobeIcon />
+                    {t('fromOutsideLibrary')}
+                  </p>
+                  <p className="mb-3 text-body text-white/90">{answer.text}</p>
+                  <p className="mb-3 text-caption text-muted">{t('webSourceCaution')}</p>
+                  <div className="flex flex-wrap gap-2">
+                    {answer.citations.map((c) => (
+                      <SourceBadge key={c.uri} name={c.title || c.uri} url={c.uri} />
+                    ))}
+                  </div>
+                </>
+              )}
+
               {!asking && answer?.kind === 'uncovered' && (
                 <p className="text-body text-sand">{t('notInOurSources')}</p>
+              )}
+
+              {!asking && answer?.kind === 'unavailable' && (
+                <p className="text-body text-sand">{t('searchUnavailable')}</p>
               )}
 
               {!asking && answer?.kind === 'failed' && (

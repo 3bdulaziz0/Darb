@@ -119,18 +119,32 @@ function validate(data: unknown, allowed: string[]): MatchResult {
 
 // ── Follow-up questions ─────────────────────────────────────────────────────
 
+export interface Citation {
+  title: string;
+  uri: string;
+}
+
 export type AskResult =
-  | { covered: true; answer: string; fact_indexes: number[] }
-  | { covered: false };
+  /** Answered from this landmark's own curated facts. */
+  | { source: 'library'; answer: string; fact_indexes: number[] }
+  /** Answered from a live search of trusted sources, with its citations. */
+  | { source: 'web'; answer: string; citations: Citation[] }
+  /** We looked in both, and neither answered it. */
+  | { source: 'none' }
+  /** We could not search at all — quota, or the network. Not the same thing. */
+  | { source: 'unavailable' };
 
 /**
- * Ask a question about one landmark. Answered strictly from that entry's
- * facts, or not at all.
+ * Ask a question about one landmark.
  *
- * `fact_indexes` are positions in the landmark's sourced facts, so the caller
- * can render the badge for each one the answer used. An answer that cites
- * nothing is returned as `covered: false` by the server — unsourced prose is
- * not something this product shows.
+ * The server tries the landmark's curated facts first. Only if they do not
+ * answer it does it search trusted sources, and only if that search returns a
+ * citation from a trusted domain does an answer come back at all.
+ *
+ * The two are deliberately different results, not one with a flag, because the
+ * UI must not present them alike: `library` carries fact indexes so each source
+ * badge can be rendered, `web` carries the real citations the search returned.
+ * An answer that cites nothing never reaches here — it arrives as 'none'.
  */
 export async function ask(
   landmark_id: string,
@@ -151,17 +165,30 @@ export async function ask(
   const data = (await response.json()) as Record<string, unknown>;
 
   if (
-    data.covered === true &&
+    data.source === 'library' &&
     typeof data.answer === 'string' &&
     Array.isArray(data.fact_indexes) &&
     data.fact_indexes.length > 0
   ) {
     return {
-      covered: true,
+      source: 'library',
       answer: data.answer,
       fact_indexes: data.fact_indexes.filter((n): n is number => Number.isInteger(n)),
     };
   }
 
-  return { covered: false };
+  if (data.source === 'web' && typeof data.answer === 'string' && Array.isArray(data.citations)) {
+    const citations = (data.citations as Citation[]).filter(
+      (c) => c && typeof c.uri === 'string' && c.uri,
+    );
+    // The server already checked this; checking again here means a change on
+    // one side cannot quietly produce an uncited answer on screen.
+    if (citations.length > 0) {
+      return { source: 'web', answer: data.answer, citations };
+    }
+  }
+
+  if (data.source === 'unavailable') return { source: 'unavailable' };
+
+  return { source: 'none' };
 }
