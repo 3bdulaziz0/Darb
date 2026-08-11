@@ -32,6 +32,8 @@ import { useLang } from '../lib/i18n';
 import { MOCK_ELEMENT_LABELS } from '../lib/mockData';
 import { ask } from '../lib/recognize';
 import { isSpeechAvailable, speak, stopSpeaking } from '../lib/speech';
+import { getRate, getVoiceId } from '../lib/narration';
+import { findVoice, voiceLabel, voicesFor } from '../lib/voices';
 import type { Landmark, SealedFact } from '../lib/types';
 
 function BackIcon() {
@@ -93,6 +95,10 @@ export default function StoryPage() {
   const [missing, setMissing] = useState(false);
 
   const [speaking, setSpeaking] = useState(false);
+  /** 'preparing' while the model generates the audio — it is not instant. */
+  const [preparingAudio, setPreparingAudio] = useState(false);
+  /** Set when the model could not be reached and the device voice stood in. */
+  const [usedDeviceVoice, setUsedDeviceVoice] = useState(false);
   const [question, setQuestion] = useState('');
   const [asking, setAsking] = useState(false);
   const [answer, setAnswer] = useState<
@@ -159,17 +165,34 @@ export default function StoryPage() {
     return landmark?.image ? [landmark.image] : [];
   }, [landmark]);
 
+  const activeVoice = findVoice(getVoiceId(lang)) ?? voicesFor(lang)[0];
+
   // Never leave a voice talking after the visitor has moved on.
   useEffect(() => stopSpeaking, []);
 
-  function toggleSpeech() {
-    if (speaking) {
+  async function toggleSpeech() {
+    if (speaking || preparingAudio) {
       stopSpeaking();
       setSpeaking(false);
+      setPreparingAudio(false);
       return;
     }
-    setSpeaking(true);
-    speak({ text: narration, lang, onEnd: () => setSpeaking(false) });
+
+    setPreparingAudio(true);
+    setUsedDeviceVoice(false);
+    try {
+      const handle = await speak({
+        text: narration,
+        lang,
+        voiceId: getVoiceId(lang),
+        rate: getRate(),
+        onEnd: () => setSpeaking(false),
+      });
+      setUsedDeviceVoice(handle.source === 'device');
+      setSpeaking(true);
+    } finally {
+      setPreparingAudio(false);
+    }
   }
 
   async function submitQuestion(e: React.FormEvent) {
@@ -299,22 +322,35 @@ export default function StoryPage() {
           <div className="mb-8 flex items-center gap-4 rounded-ctl border border-hairline bg-surface-high/60 p-4">
             <button
               type="button"
-              onClick={toggleSpeech}
+              onClick={() => void toggleSpeech()}
               disabled={!isSpeechAvailable() || !narration}
-              aria-label={speaking ? t('stopListening') : t('listen')}
+              aria-label={speaking || preparingAudio ? t('stopListening') : t('listen')}
               className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-accent
                          text-white transition-opacity disabled:opacity-40"
             >
-              {speaking ? <StopIcon /> : <PlayIcon />}
+              {speaking || preparingAudio ? <StopIcon /> : <PlayIcon />}
             </button>
             <div className="flex-1">
               <div className="mb-2 flex items-center justify-between gap-2">
                 <span className="label-caps text-white">
-                  {speaking ? t('stopListening') : t('overview')}
+                  {preparingAudio
+                    ? t('preparingAudio')
+                    : speaking
+                      ? t('stopListening')
+                      : t('overview')}
                 </span>
-                <span className="flex items-center gap-1 rounded border border-hairline bg-surface-highest px-2 py-1 text-muted">
+                <span
+                  className={[
+                    'flex items-center gap-1 rounded border px-2 py-1',
+                    usedDeviceVoice
+                      ? 'border-sand/40 bg-sand/10 text-sand'
+                      : 'border-hairline bg-surface-highest text-muted',
+                  ].join(' ')}
+                >
                   <VoiceIcon />
-                  <span className="label-caps text-[10px]">{t('voice')}: Layla</span>
+                  <span className="label-caps text-[10px]">
+                    {usedDeviceVoice ? t('deviceVoice') : voiceLabel(activeVoice, lang)}
+                  </span>
                 </span>
               </div>
               <div className="h-1 w-full overflow-hidden rounded-full bg-surface-highest">

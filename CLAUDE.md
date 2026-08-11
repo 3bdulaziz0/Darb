@@ -41,6 +41,8 @@ works if nobody reaches across the line.
 | `src/lib/categories.ts` | **shared** | Category labels (ar/en) + map pin colours |
 | `src/lib/i18n.ts` | **C** | Every interface string, both languages |
 | `src/lib/favourites.ts` | **C** | Starred landmarks, localStorage |
+| `src/lib/voices.ts` | **shared** | The four narration voices |
+| `src/lib/narration.ts` | **C** | Chosen voice + speed, session-scoped |
 | `src/components/PhotoCarousel.tsx` | **C** | Reference-photo gallery |
 | `src/components/FavouriteStar.tsx` | **C** | The star toggle |
 | `src/components/SourceBadge.tsx` | **shared** | Rule 2 lives here — review any change |

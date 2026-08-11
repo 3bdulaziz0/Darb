@@ -57,6 +57,7 @@ Two serverless functions, both in `api/`, both reading the key server-side:
 |---|---|
 | `POST /api/recognize` | Identifies the photo against a candidate list, or refuses |
 | `POST /api/ask` | Answers a follow-up strictly from that landmark's stored facts |
+| `POST /api/speak` | Reads the story aloud in one of four model voices |
 
 `npm run dev` serves them too, through a small plugin in `vite.config.ts`, so
 the app behaves the same locally as deployed.
