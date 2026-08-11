@@ -101,14 +101,14 @@ const en = {
   stopListening: 'Stop',
   thinking: 'Reading our sources…',
   notInOurSources:
-    'Our sources do not cover that. I will not answer it from anywhere else.',
+    "I could not find that — not in our records, and not in the sources I trust. I would rather tell you that than guess.",
   askFailed: 'That did not go through. Try again.',
   answerFrom: 'Answered from',
   fromOutsideLibrary: 'Not in our library — found in trusted sources',
   webSourceCaution:
     'We did not curate this. Check the source before you rely on it.',
   searchUnavailable:
-    'Our sources do not cover it, and I could not search right now. I would rather say that than guess.',
+    "It is not in our records, and I could not go and look it up just now. I would rather say so than make something up.",
   preparingAudio: 'Preparing the voice…',
   deviceVoice: 'Device voice',
 
@@ -185,13 +185,13 @@ const ar: Record<keyof typeof en, string> = {
   listen: 'استمع',
   stopListening: 'إيقاف',
   thinking: 'أقرأ مصادرنا…',
-  notInOurSources: 'مصادرنا لا تغطّي هذا السؤال، ولن أجيب عليه من مكان آخر.',
+  notInOurSources: 'ما لقيت هذي المعلومة، لا عندنا ولا في المصادر اللي أثق فيها. أفضّل أقول لك ما أدري على أن أخمّن.',
   askFailed: 'لم تكتمل العملية. حاول مرة أخرى.',
   answerFrom: 'الإجابة مأخوذة من',
   fromOutsideLibrary: 'ليست في مكتبتنا — وجدتها في مصادر موثوقة',
   webSourceCaution: 'هذه لم نراجعها بأنفسنا. تحقّق من المصدر قبل الاعتماد عليها.',
   searchUnavailable:
-    'مصادرنا لا تغطّي هذا، وتعذّر عليّ البحث الآن. أفضّل أن أقول ذلك على أن أخمّن.',
+    'ما هي عندنا، وما قدرت أبحث عنها الحين. أفضّل أقول لك كذا على أن أختلق شيئًا.',
   preparingAudio: 'يُجهَّز الصوت…',
   deviceVoice: 'صوت الجهاز',
 
