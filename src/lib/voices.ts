@@ -34,42 +34,57 @@ export interface VoiceOption {
   character_en: string;
 }
 
+/**
+ * The names a visitor sees are people's names, not the model's.
+ *
+ * "Kore" and "Achernar" are Google's internal labels for its prebuilt voices —
+ * star names, meaningless to anyone choosing a narrator. A visitor picking who
+ * will tell them a story is choosing a person, so the list reads as people.
+ * The design mock had Layla, Omar and Sarah; this keeps them.
+ *
+ * `gemini` is the real voice id and the only part the API sees. Renaming
+ * anyone here is a label change, never a change of voice.
+ *
+ * The Arabic character words agree in gender with the name they sit beside —
+ * هادئة for ليلى, واضح for عمر — which is why they are written per voice
+ * rather than shared across the pair.
+ */
 export const VOICES: VoiceOption[] = [
   {
-    id: 'ar-kore',
+    id: 'ar-layla',
     gemini: 'Kore',
     lang: 'ar',
-    label_ar: 'كوري',
-    label_en: 'Kore',
-    character_ar: 'واضح',
-    character_en: 'Firm',
+    label_ar: 'ليلى',
+    label_en: 'Layla',
+    character_ar: 'هادئة',
+    character_en: 'Calm',
   },
   {
-    id: 'ar-achernar',
-    gemini: 'Achernar',
+    id: 'ar-omar',
+    gemini: 'Orus',
     lang: 'ar',
-    label_ar: 'أخرنار',
-    label_en: 'Achernar',
-    character_ar: 'هادئ',
-    character_en: 'Soft',
+    label_ar: 'عمر',
+    label_en: 'Omar',
+    character_ar: 'واضح',
+    character_en: 'Clear',
   },
   {
-    id: 'en-charon',
-    gemini: 'Charon',
-    lang: 'en',
-    label_ar: 'كارون',
-    label_en: 'Charon',
-    character_ar: 'إخباري',
-    character_en: 'Informative',
-  },
-  {
-    id: 'en-aoede',
+    id: 'en-sarah',
     gemini: 'Aoede',
     lang: 'en',
-    label_ar: 'أويدي',
-    label_en: 'Aoede',
-    character_ar: 'خفيف',
-    character_en: 'Breezy',
+    label_ar: 'سارة',
+    label_en: 'Sarah',
+    character_ar: 'دافئة',
+    character_en: 'Warm',
+  },
+  {
+    id: 'en-adam',
+    gemini: 'Charon',
+    lang: 'en',
+    label_ar: 'آدم',
+    label_en: 'Adam',
+    character_ar: 'رصين',
+    character_en: 'Measured',
   },
 ];
 
