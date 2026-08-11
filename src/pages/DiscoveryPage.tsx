@@ -27,6 +27,7 @@ import {
   withDistance,
 } from '../lib/library';
 import { useLang } from '../lib/i18n';
+import { favouriteCount, isFavourite, onFavouritesChanged } from '../lib/favourites';
 import { MOCK_ORIGIN } from '../lib/mockData';
 import type { Category, DiscoveryScope, Landmark } from '../lib/types';
 
@@ -88,7 +89,14 @@ export default function DiscoveryPage() {
 
   const [library, setLibrary] = useState<Landmark[]>([]);
   const [scope, setScope] = useState<DiscoveryScope>(5);
-  const [category, setCategory] = useState<Category | 'all'>('all');
+  // 'favourites' is a filter, not a place type, so it is not in the Category
+  // union — it sits alongside it here and nowhere else.
+  const [category, setCategory] = useState<Category | 'all' | 'favourites'>('all');
+  const [starred, setStarred] = useState(favouriteCount);
+
+  // Unstarring the last favourite while looking at the favourites list should
+  // update the list, not strand the visitor on a stale one.
+  useEffect(() => onFavouritesChanged(() => setStarred(favouriteCount())), []);
   /** How many rows are on screen. Grows in PAGE_SIZE steps, never all at once. */
   const [shown, setShown] = useState(PAGE_SIZE);
 
@@ -102,10 +110,13 @@ export default function DiscoveryPage() {
   // Both filters apply at once: narrow by category first, then by distance.
   // Category filtering happens here rather than inside nearby() so the distance
   // helpers stay pure and know nothing about display concerns.
-  const inCategory = useMemo(
-    () => (category === 'all' ? library : library.filter((l) => l.category === category)),
-    [library, category],
-  );
+  const inCategory = useMemo(() => {
+    if (category === 'all') return library;
+    if (category === 'favourites') return library.filter((l) => isFavourite(l.id));
+    return library.filter((l) => l.category === category);
+    // `starred` is in the deps so the list re-filters the moment a star is
+    // tapped — isFavourite reads a module store React cannot see on its own.
+  }, [library, category, starred]);
 
   // 'all' skips the radius filter but keeps the distance sort, so the nearest
   // is still first — you just are not cut off at a boundary.
@@ -116,17 +127,21 @@ export default function DiscoveryPage() {
   // beneath them. Each pinned row carries a badge, so the ordering is visible
   // rather than mysterious.
   const results = useMemo(() => {
-    const list =
-      scope === 'all'
-        ? withDistance(inCategory, origin.lat, origin.lng)
-        : nearby(inCategory, origin.lat, origin.lng, scope);
+    // Favourites ignore the radius on purpose. You starred a place because you
+    // mean to go there, not because it is nearby — a list that hides the thing
+    // you saved is not a favourites list. Distances still show, so how far it
+    // is remains visible.
+    const ignoreRadius = scope === 'all' || category === 'favourites';
+    const list = ignoreRadius
+      ? withDistance(inCategory, origin.lat, origin.lng)
+      : nearby(inCategory, origin.lat, origin.lng, scope);
 
     return [...list].sort(
       (a, b) =>
         Number(Boolean(b.landmark.test_ready)) - Number(Boolean(a.landmark.test_ready)) ||
         a.distance_km - b.distance_km,
     );
-  }, [inCategory, origin, scope]);
+  }, [inCategory, origin, scope, category]);
 
   // Changing either filter starts the list again from the top.
   useEffect(() => {
@@ -146,7 +161,14 @@ export default function DiscoveryPage() {
     [inCategory],
   );
 
-  const label = category === 'all' ? null : categoryLabel(category, lang);
+  const label =
+    category === 'all'
+      ? null
+      : category === 'favourites'
+        ? lang === 'ar'
+          ? 'المفضلة'
+          : 'Favourites'
+        : categoryLabel(category, lang);
 
   /**
    * "3 heritage landmarks" · "٣ معالم · تراثي"
@@ -168,7 +190,7 @@ export default function DiscoveryPage() {
 
   /** "4 landmarks within 5 km" · "٤ معالم ضمن ٥ كم" */
   const summary = (n: number) => {
-    if (scope === 'all') {
+    if (scope === 'all' || category === 'favourites') {
       return lang === 'ar'
         ? `${noun(n)} في ${cityCount} ${cityCount === 1 ? 'مدينة' : 'مدن'}`
         : `${noun(n)} across ${cityCount} ${cityCount === 1 ? 'city' : 'cities'}`;
@@ -229,6 +251,26 @@ export default function DiscoveryPage() {
             ].join(' ')}
           >
             {t('all')}
+          </button>
+
+          {/* Favourites. Shown even when empty, so the star has somewhere
+              obvious to lead once you use it. */}
+          <button
+            type="button"
+            onClick={() => setCategory('favourites')}
+            aria-pressed={category === 'favourites'}
+            className={[
+              'flex h-touch shrink-0 items-center gap-1.5 rounded-full border px-4 label-caps transition-colors',
+              category === 'favourites'
+                ? 'border-sand bg-sand text-bg'
+                : 'border-sand/40 bg-sand/10 text-sand',
+            ].join(' ')}
+          >
+            <svg viewBox="0 0 24 24" aria-hidden="true" className="h-3.5 w-3.5" fill="currentColor">
+              <path d="M12 3.5l2.6 5.3 5.9.9-4.3 4.1 1 5.8-5.2-2.7-5.2 2.7 1-5.8L3.5 9.7l5.9-.9z" />
+            </svg>
+            {lang === 'ar' ? 'المفضلة' : 'Favourites'}
+            {starred > 0 && <span className="opacity-70">{starred}</span>}
           </button>
 
           {CATEGORIES.map((key) => {
@@ -304,7 +346,11 @@ export default function DiscoveryPage() {
                 "nothing of this category at all" are different facts, and
                 telling the visitor the wrong one sends them walking. */}
             <p className="mb-6 text-body text-muted">
-              {inCategory.length === 0
+              {category === 'favourites' && starred === 0
+                ? lang === 'ar'
+                  ? 'اضغط النجمة عند أي معلم لإضافته هنا.'
+                  : 'Tap the star on any landmark to add it here.'
+                : inCategory.length === 0
                 ? lang === 'ar'
                   ? `مكتبتنا لا تغطي أي معالم من تصنيف ${label} حتى الآن.`
                   : `Our library doesn't cover any ${label?.toLowerCase()} landmarks yet.`
@@ -351,8 +397,9 @@ export default function DiscoveryPage() {
             )}
 
             {/* Widening the radius only helps while there is a radius to
-                widen. On 'all' there is nowhere further to look. */}
-            {scope !== 'all' && (
+                widen — never on 'all', and never in favourites, where the
+                radius is not what is holding the list back. */}
+            {scope !== 'all' && category !== 'favourites' && (
               <button
                 type="button"
                 onClick={() => setScope('all')}

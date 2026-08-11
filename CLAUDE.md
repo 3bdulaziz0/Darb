@@ -40,6 +40,9 @@ works if nobody reaches across the line.
 | `src/lib/types.ts` | **frozen** | Shared types. Changing one changes everyone's work |
 | `src/lib/categories.ts` | **shared** | Category labels (ar/en) + map pin colours |
 | `src/lib/i18n.ts` | **C** | Every interface string, both languages |
+| `src/lib/favourites.ts` | **C** | Starred landmarks, localStorage |
+| `src/components/PhotoCarousel.tsx` | **C** | Reference-photo gallery |
+| `src/components/FavouriteStar.tsx` | **C** | The star toggle |
 | `src/components/SourceBadge.tsx` | **shared** | Rule 2 lives here — review any change |
 | `src/lib/mockData.ts` | **shared** | Dev scaffolding. Delete before the demo |
 
@@ -116,6 +119,9 @@ from `category`. `npm run photos` links reference photographs for flagged
 entries only, so dropping a folder of images in never silently enlarges what
 the matcher is judged on. Photos for unflagged landmarks sit on disk, are
 gitignored, and the script reports how many are waiting.
+
+The story page shows every reference photo as a swipeable gallery, so the
+folder's contents are what a visitor browses. Shoot accordingly.
 
 Photos live in `public/landmarks/<id>/`, one folder per landmark. Drop the
 files in and run `npm run photos`; the script writes `reference_images` into

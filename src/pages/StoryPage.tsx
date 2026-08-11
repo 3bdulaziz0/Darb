@@ -24,8 +24,10 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { SourceBadge, SourcedFact } from '../components/SourceBadge';
 import { PHOTO_PENDING } from '../components/LandmarkCard';
+import FavouriteStar from '../components/FavouriteStar';
+import PhotoCarousel from '../components/PhotoCarousel';
 import { categoryColor, categoryLabel } from '../lib/categories';
-import { getLandmark, loadLandmarks, sealFacts, withDistance } from '../lib/library';
+import { getLandmark, loadLandmarks, mapsUrl, sealFacts, withDistance } from '../lib/library';
 import { useLang } from '../lib/i18n';
 import { MOCK_ELEMENT_LABELS } from '../lib/mockData';
 import { ask } from '../lib/recognize';
@@ -45,6 +47,15 @@ function PlayIcon() {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" className="h-6 w-6" fill="currentColor">
       <path d="M8 5.5v13l11-6.5-11-6.5Z" />
+    </svg>
+  );
+}
+
+function DirectionsIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5"
+         fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinejoin="round">
+      <path d="M12 3 20 21l-8-4-8 4Z" />
     </svg>
   );
 }
@@ -139,6 +150,15 @@ export default function StoryPage() {
     [facts, lang],
   );
 
+  // Every photo we hold of this landmark, best one first. `image` is already
+  // the first reference photo when there are any, so it is only added when
+  // there are none.
+  const gallery = useMemo(() => {
+    const refs = landmark?.reference_images ?? [];
+    if (refs.length) return refs;
+    return landmark?.image ? [landmark.image] : [];
+  }, [landmark]);
+
   // Never leave a voice talking after the visitor has moved on.
   useEffect(() => stopSpeaking, []);
 
@@ -199,21 +219,40 @@ export default function StoryPage() {
     <div className="relative h-full w-full">
       {/* Hero */}
       <div className="absolute inset-x-0 top-0 h-[45%]">
-        <img
-          src={capturedImage ?? landmark.image}
-          alt=""
-          onError={(e) => {
-            e.currentTarget.src = PHOTO_PENDING;
-          }}
-          className="h-full w-full object-cover"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/50 to-transparent" />
+        {capturedImage ? (
+          // The frame the visitor just took wins: it is what they are looking
+          // at, and it is the evidence for the match.
+          <img
+            src={capturedImage}
+            alt=""
+            onError={(e) => {
+              e.currentTarget.src = PHOTO_PENDING;
+            }}
+            className="h-full w-full object-cover"
+          />
+        ) : (
+          <PhotoCarousel images={gallery} alt={name} />
+        )}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-black/50 to-transparent" />
       </div>
 
       <div className="absolute inset-x-0 top-0 z-20 flex items-center justify-between p-gutter">
         <Link to="/" aria-label={t('back')} className="control glass text-white">
           <BackIcon />
         </Link>
+
+        <div className="flex items-center gap-2">
+          <FavouriteStar landmarkId={landmark.id} className="glass" />
+          <a
+            href={mapsUrl(landmark)}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={lang === 'ar' ? 'الاتجاهات في خرائط قوقل' : 'Directions in Google Maps'}
+            className="control glass text-white"
+          >
+            <DirectionsIcon />
+          </a>
+        </div>
       </div>
 
       {/* Sheet */}

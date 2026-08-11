@@ -9,8 +9,8 @@
       "outdoor",
       "city_center"
     ],
-    "lat": 24.63111,
-    "lng": 46.71333,
+    "lat": 24.631319,
+    "lng": 46.713406,
     "image": "/landmarks/lm_masmak/01-masmak-fort-12753717253.jpg",
     "elements": [
       "أبراج مراقبة",
@@ -111,8 +111,8 @@
       "sunset",
       "family_friendly"
     ],
-    "lat": 26.63,
-    "lng": 38.01,
+    "lat": 26.689361,
+    "lng": 37.9815,
     "image": "/landmarks/lm_elephant_rock/01-al-ulla-hijaz-railway.jpg",
     "elements": [
       "حجر رملي",
@@ -4606,8 +4606,8 @@
     "id": "lm_jeddah_king_fahds_fountain",
     "name_ar": "نافورة الملك فهد",
     "name_en": "King Fahd’s Fountain",
-    "lat": 21.519092819866945,
-    "lng": 39.15295607116466,
+    "lat": 21.519093,
+    "lng": 39.152956,
     "image": "/landmarks/lm_jeddah_king_fahds_fountain/01-king-fahd-fountain.jpg",
     "facts": [
       {
@@ -4700,8 +4700,8 @@
     "id": "lm_jeddah_historic_jeddah",
     "name_ar": "جدة التاريخية (البلد)",
     "name_en": "Historic Jeddah",
-    "lat": 21.484880433527945,
-    "lng": 39.18355512883534,
+    "lat": 21.48488,
+    "lng": 39.183555,
     "image": "/landmarks/lm_jeddah_historic_jeddah/01-traditional-house-interior-in-historic-j.jpg",
     "facts": [
       {
@@ -5344,8 +5344,8 @@
     "id": "lm_madinah_quba_mosque",
     "name_ar": "مسجد قُباء",
     "name_en": "Quba Mosque",
-    "lat": 24.439477705601476,
-    "lng": 39.617195108503964,
+    "lat": 24.439478,
+    "lng": 39.617195,
     "image": "/landmarks/lm_madinah_quba_mosque/01-masjid-quba-umroh-ramadhan-2023-3.jpg",
     "facts": [
       {
@@ -6500,8 +6500,8 @@
     "id": "lm_alahsa_al_qarah_mountain",
     "name_ar": "جبل القارة",
     "name_en": "Al Qarah Mountain",
-    "lat": 25.4114828,
-    "lng": 49.6928144,
+    "lat": 25.411483,
+    "lng": 49.692814,
     "image": "/landmarks/lm_alahsa_al_qarah_mountain/01-path-to-jabal-algara-caves.jpg",
     "facts": [
       {

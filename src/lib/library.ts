@@ -341,6 +341,21 @@ export function sealFacts(landmark: Landmark): SealedFact[] {
 // ── Formatting ──────────────────────────────────────────────────────────────
 
 /**
+ * A Google Maps link to this landmark, for handing off directions.
+ *
+ * Built from the coordinates rather than stored, so there is one source of
+ * truth and the link can never drift from the pin. Searching by coordinate
+ * rather than by name puts the pin exactly on the landmark — a name search
+ * would guess, and guessing is the thing we do not do.
+ *
+ * Routing itself is deliberately not in this app: the visitor's own map knows
+ * their transport, traffic and language already.
+ */
+export function mapsUrl(landmark: Coordinates): string {
+  return `https://www.google.com/maps/search/?api=1&query=${landmark.lat},${landmark.lng}`;
+}
+
+/**
  * Turns 0.42 into "420 M" and 2.37 into "2.4 KM", for display.
  * Pass 'ar' for the Arabic units — "420 م" / "2.4 كم".
  */

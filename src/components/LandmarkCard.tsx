@@ -3,8 +3,8 @@
  *
  * DONE:  the discovery list row from design/nearby_landmarks — thumbnail,
  *        name, distance in heritage sand, directions handoff.
- * TODO:  the directions button is inert. Wire it to an external maps URL
- *        (T-34). There is no in-app routing, by scope.
+ * DONE:  the directions button hands off to Google Maps (T-34), and the star
+ *        adds the landmark to the visitor's favourites.
  *
  * RULE 1: this card shows a name and a distance. Never add a subtitle that
  * summarises the landmark's history — that would be an unsourced fact.
@@ -12,7 +12,8 @@
 
 import { Link } from 'react-router-dom';
 import type { Lang, Landmark } from '../lib/types';
-import { formatDistance } from '../lib/library';
+import { formatDistance, mapsUrl } from '../lib/library';
+import FavouriteStar from './FavouriteStar';
 
 /** Shown wherever a landmark's photo has not been taken yet. */
 export const PHOTO_PENDING = '/images/placeholder.jpg';
@@ -46,6 +47,7 @@ export default function LandmarkCard({
 }) {
   // Most of the library is not translated yet. Fall back to the language we
   // have rather than rendering a blank row.
+  const directionsLabel = lang === 'ar' ? 'الاتجاهات في خرائط قوقل' : 'Directions in Google Maps';
   const name = (lang === 'ar' ? landmark.name_ar : landmark.name_en) || landmark.name_en;
   const otherName = lang === 'ar' ? landmark.name_en : landmark.name_ar;
 
@@ -89,12 +91,25 @@ export default function LandmarkCard({
         {distanceKm !== undefined && (
           <span className="label-caps text-sand">{formatDistance(distanceKm, lang)}</span>
         )}
-        <span
-          className="control h-touch w-touch border border-hairline bg-surface-high text-muted"
-          aria-hidden="true"
-        >
-          <DirectionsIcon />
-        </span>
+
+        <div className="flex items-center">
+          <FavouriteStar landmarkId={landmark.id} />
+
+          {/* Hands off to the visitor's own map app. Opening in a new tab
+              means they keep their place here. */}
+          <a
+            href={mapsUrl(landmark)}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+            aria-label={directionsLabel}
+            title={directionsLabel}
+            className="control border border-hairline bg-surface-high text-muted
+                       transition-colors hover:border-accent/50 hover:text-accent-soft"
+          >
+            <DirectionsIcon />
+          </a>
+        </div>
       </div>
     </Link>
   );
