@@ -44,6 +44,7 @@ works if nobody reaches across the line.
 | `src/lib/voices.ts` | **shared** | The four narration voices |
 | `src/lib/narration.ts` | **C** | Chosen voice + speed, session-scoped |
 | `src/components/PhotoCarousel.tsx` | **C** | Reference-photo gallery |
+| `src/components/LandmarkMap.tsx` | **C** | Leaflet map, position + pins |
 | `src/components/FavouriteStar.tsx` | **C** | The star toggle |
 | `src/components/SourceBadge.tsx` | **shared** | Rule 2 lives here — review any change |
 | `src/lib/mockData.ts` | **shared** | Dev scaffolding. Delete before the demo |

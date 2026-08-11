@@ -2,14 +2,13 @@
  * OWNER: teammate C (T-31, T-32, T-33, T-34).
  *
  * DONE:  the discovery screen from design/nearby_landmarks and
- *        design/empty_discovery_state — map placeholder, 1/5/20 km selector,
- *        distance-sorted list, honest empty state, bottom nav.
- * TODO:  1. Real map with the user's position and landmark pins (T-32).
- *        2. Real geolocation as the distance origin, with accuracy captured
- *           (T-29, teammate A). If permission is denied, hide distances —
- *           never estimate them from an assumed position.
- *        3. Progressive loading once the list can exceed a screenful (T-31).
- *        4. External maps handoff per row (T-34).
+ *        design/empty_discovery_state — live map with the visitor's position
+ *        and a pin per landmark (T-32), real geolocation as the distance
+ *        origin (T-29), scope selector, distance-sorted list with progressive
+ *        loading (T-31), honest empty state, maps handoff per row (T-34).
+ * TODO:  manual area selection when location is refused. Today the list still
+ *        works without a fix — it simply shows no distances — which is the
+ *        behaviour the PRD asks for, but not yet the UI.
  *
  * RULE 1: the list shows curated library entries only. When the radius is
  * empty, say so — do not pad the list with uncurated places.
@@ -18,6 +17,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import LandmarkCard from '../components/LandmarkCard';
+import LandmarkMap from '../components/LandmarkMap';
 import SettingsIcon from '../components/SettingsIcon';
 import { CATEGORIES, categoryColor, categoryLabel } from '../lib/categories';
 import {
@@ -29,8 +29,8 @@ import {
 } from '../lib/library';
 import { useLang } from '../lib/i18n';
 import { favouriteCount, isFavourite, onFavouritesChanged } from '../lib/favourites';
-import { MOCK_ORIGIN } from '../lib/mockData';
-import type { Category, DiscoveryScope, Landmark } from '../lib/types';
+import { getPosition } from '../lib/location';
+import type { Category, Coordinates, DiscoveryScope, Landmark } from '../lib/types';
 
 const SCOPES: DiscoveryScope[] = [1, 5, 20, 'all'];
 
@@ -96,8 +96,28 @@ export default function DiscoveryPage() {
   /** How many rows are on screen. Grows in PAGE_SIZE steps, never all at once. */
   const [shown, setShown] = useState(PAGE_SIZE);
 
-  // TODO(A/C): real coordinates from the Geolocation API (T-29).
-  const origin = MOCK_ORIGIN;
+  /**
+   * The visitor's real position (T-29).
+   *
+   * Without it we do not invent one. Distances vanish rather than being
+   * measured from a guess, because a wrong distance sends someone walking.
+   */
+  const [position, setPosition] = useState<
+    { state: 'acquiring' } | { state: 'ready'; coords: Coordinates } | { state: 'off' }
+  >({ state: 'acquiring' });
+
+  useEffect(() => {
+    let live = true;
+    void getPosition().then((result) => {
+      if (!live) return;
+      setPosition(result.ok ? { state: 'ready', coords: result } : { state: 'off' });
+    });
+    return () => {
+      live = false;
+    };
+  }, []);
+
+  const coords = position.state === 'ready' ? position.coords : null;
 
   useEffect(() => {
     void loadLandmarks().then(setLibrary);
@@ -122,22 +142,30 @@ export default function DiscoveryPage() {
   // be what a visitor meets first; everything else stays in distance order
   // beneath them. Each pinned row carries a badge, so the ordering is visible
   // rather than mysterious.
-  const results = useMemo(() => {
+  const results = useMemo((): { landmark: Landmark; distance_km: number | null }[] => {
+    // No position means no radius and no distances — only the order we can
+    // still justify, which is the ones the camera can identify first.
+    if (!coords) {
+      return [...inCategory]
+        .sort((a, b) => Number(Boolean(b.test_ready)) - Number(Boolean(a.test_ready)))
+        .map((landmark) => ({ landmark, distance_km: null }));
+    }
+
     // Favourites ignore the radius on purpose. You starred a place because you
     // mean to go there, not because it is nearby — a list that hides the thing
     // you saved is not a favourites list. Distances still show, so how far it
     // is remains visible.
     const ignoreRadius = scope === 'all' || category === 'favourites';
     const list = ignoreRadius
-      ? withDistance(inCategory, origin.lat, origin.lng)
-      : nearby(inCategory, origin.lat, origin.lng, scope);
+      ? withDistance(inCategory, coords.lat, coords.lng)
+      : nearby(inCategory, coords.lat, coords.lng, scope);
 
     return [...list].sort(
       (a, b) =>
         Number(Boolean(b.landmark.test_ready)) - Number(Boolean(a.landmark.test_ready)) ||
         a.distance_km - b.distance_km,
     );
-  }, [inCategory, origin, scope, category]);
+  }, [inCategory, coords, scope, category]);
 
   // Changing either filter starts the list again from the top.
   useEffect(() => {
@@ -147,8 +175,8 @@ export default function DiscoveryPage() {
   // The nearest covered area respects the category filter too — offering a
   // museum to someone filtering for markets would not be an answer.
   const nearest = useMemo(
-    () => nearestCoveredArea(inCategory, origin.lat, origin.lng),
-    [inCategory, origin],
+    () => (coords ? nearestCoveredArea(inCategory, coords.lat, coords.lng) : null),
+    [inCategory, coords],
   );
 
   /** How many cities the filtered library actually reaches. */
@@ -186,7 +214,9 @@ export default function DiscoveryPage() {
 
   /** "4 landmarks within 5 km" · "٤ معالم ضمن ٥ كم" */
   const summary = (n: number) => {
-    if (scope === 'all' || category === 'favourites') {
+    // Without a position there is no radius to speak of, so the sentence must
+    // not imply one.
+    if (!coords || scope === 'all' || category === 'favourites') {
       return lang === 'ar'
         ? `${noun(n)} في ${cityCount} ${cityCount === 1 ? 'مدينة' : 'مدن'}`
         : `${noun(n)} across ${cityCount} ${cityCount === 1 ? 'city' : 'cities'}`;
@@ -196,14 +226,21 @@ export default function DiscoveryPage() {
 
   return (
     <div className="flex h-full flex-col">
-      {/* Map placeholder */}
+      {/* The map shows exactly what the list shows, so the two can never
+          disagree. Tapping a pin opens that landmark's story. */}
       <div className="relative h-[32%] shrink-0">
-        <img src="/images/map.svg" alt="" className="h-full w-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-bg" />
-        <span className="absolute bottom-3 start-gutter label-caps text-muted">
-          {/* TODO(C): T-32 — real map with pins. */}
-          {t('mapPlaceholder')}
-        </span>
+        <LandmarkMap
+          landmarks={results.map((r) => r.landmark)}
+          origin={coords}
+          className="h-full w-full"
+        />
+
+        {position.state !== 'ready' && (
+          <span className="pointer-events-none absolute bottom-2 start-gutter z-[500] rounded-full
+                           bg-black/60 px-3 py-1 label-caps text-sand backdrop-blur-glass">
+            {position.state === 'acquiring' ? t('locating') : t('locationOff')}
+          </span>
+        )}
       </div>
 
       <div className="scroll-area flex-1 px-gutter pt-4">
@@ -219,9 +256,13 @@ export default function DiscoveryPage() {
               type="button"
               onClick={() => setScope(s)}
               aria-pressed={scope === s}
+              // A radius needs somewhere to measure from. Rather than filter
+              // by a number that means nothing, the chips wait for a fix.
+              disabled={!coords && s !== 'all'}
               className={[
                 'h-touch shrink-0 rounded-full px-5 text-body transition-colors',
                 scope === s ? 'bg-accent font-semibold text-white' : 'text-muted',
+                !coords && s !== 'all' ? 'opacity-40' : '',
               ].join(' ')}
             >
               {s === 'all' ? t('all') : `${s} ${lang === 'ar' ? 'كم' : 'KM'}`}
@@ -300,7 +341,11 @@ export default function DiscoveryPage() {
             <ul className="flex flex-col gap-3">
               {results.slice(0, shown).map(({ landmark, distance_km }) => (
                 <li key={landmark.id}>
-                  <LandmarkCard landmark={landmark} distanceKm={distance_km} lang={lang} />
+                  <LandmarkCard
+                    landmark={landmark}
+                    distanceKm={distance_km ?? undefined}
+                    lang={lang}
+                  />
                 </li>
               ))}
             </ul>
