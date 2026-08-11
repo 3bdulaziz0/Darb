@@ -114,27 +114,34 @@ export default function PhotoCarousel({ images, alt = '' }: { images: string[]; 
             <ChevronIcon />
           </button>
 
-          {/* Counter, in the corner away from the back button. */}
-          <span className="absolute end-3 top-3 rounded-full bg-black/50 px-2.5 py-1 label-caps
-                           text-white backdrop-blur-glass">
-            {index + 1} / {count}
-          </span>
+          {/* Counter and dots are one control, on one line, above the sheet.
+              The counter used to sit top-end and collided with the directions
+              button — that corner belongs to actions, not to status. Grouping
+              the two also means the number and the dots can never disagree. */}
+          <div className="absolute inset-x-0 bottom-[42%] flex items-center justify-center gap-3">
+            <span
+              className="rounded-full bg-black/50 px-2.5 py-1 label-caps text-white backdrop-blur-glass"
+              // Latin digits and the slash read left-to-right even in Arabic.
+              dir="ltr"
+            >
+              {index + 1} / {count}
+            </span>
 
-          {/* Dots sit above the sheet so they stay visible. */}
-          <div className="absolute inset-x-0 bottom-[42%] flex justify-center gap-1.5">
-            {images.map((src, i) => (
-              <button
-                key={src}
-                type="button"
-                onClick={() => setIndex(i)}
-                aria-label={`${lang === 'ar' ? 'صورة' : 'Photo'} ${i + 1}`}
-                aria-current={i === index}
-                className={[
-                  'h-1.5 rounded-full transition-all',
-                  i === index ? 'w-5 bg-white' : 'w-1.5 bg-white/50',
-                ].join(' ')}
-              />
-            ))}
+            <div className="flex items-center gap-1.5">
+              {images.map((src, i) => (
+                <button
+                  key={src}
+                  type="button"
+                  onClick={() => setIndex(i)}
+                  aria-label={`${lang === 'ar' ? 'صورة' : 'Photo'} ${i + 1}`}
+                  aria-current={i === index}
+                  className={[
+                    'h-1.5 rounded-full transition-all',
+                    i === index ? 'w-5 bg-white' : 'w-1.5 bg-white/50',
+                  ].join(' ')}
+                />
+              ))}
+            </div>
           </div>
         </>
       )}
